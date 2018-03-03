@@ -12,10 +12,22 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
+#DATABASES = {
+#    'default': dj_database_url.config(
+#        default=config('DATABASE_URL')
+#    )
+#}
+
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL')
-    )
+  'default': {
+      'ENGINE': 'django.db.backends.postgresql_psycopg2',
+      'NAME': 'mydb',
+      'USER': 'protest',
+      'PASSWORD': 'abc_110141',
+      'HOST': 'localhost',
+      'PORT': '5432',
+  }
 }
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
@@ -101,10 +113,10 @@ LOCALE_PATHS = (PROJECT_DIR.child('locale'), )
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_ROOT = PROJECT_DIR.parent.child('staticfiles')
-STATIC_URL = '/static/'
+STATIC_URL = ('/static/')
 
 STATICFILES_DIRS = (
-    PROJECT_DIR.child('static'),
+    PROJECT_DIR.parent.child('static'),
 )
 
 MEDIA_ROOT = PROJECT_DIR.parent.child('media')
