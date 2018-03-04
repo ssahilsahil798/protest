@@ -53,18 +53,18 @@ $(function () {
         }
     });
 
-    $(".btn-compose").click(function () {
-        if ($(".compose").hasClass("composing")) {
-            $(".compose").removeClass("composing");
-            $(".compose").slideUp();
-        }
-        else {
+    (function () {
+        //if ($(".compose").hasClass("composing")) {
+        //    $(".compose").removeClass("composing");
+        //    $(".compose").slideUp(); 
+        //}
+        //else {
             $(".compose").addClass("composing");
             $(".compose textarea").val("");
             $(".compose").slideDown(400, function () {
                 $(".compose textarea").focus();
             });
-        }
+        //}
     });
 
     $(".btn-cancel-compose").click(function () {

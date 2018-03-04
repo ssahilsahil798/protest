@@ -11,7 +11,6 @@ SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
-
 #DATABASES = {
 #    'default': dj_database_url.config(
 #        default=config('DATABASE_URL')
@@ -30,7 +29,7 @@ DATABASES = {
   }
 }
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+ALLOWED_HOSTS = ['www.freemediaweb.com', '139.59.91.253']
 
 # Application definition
 
@@ -116,7 +115,7 @@ STATIC_ROOT = PROJECT_DIR.parent.child('staticfiles')
 STATIC_URL = ('/static/')
 
 STATICFILES_DIRS = (
-    PROJECT_DIR.parent.child('static'),
+    PROJECT_DIR.child('static'),
 )
 
 MEDIA_ROOT = PROJECT_DIR.parent.child('media')
