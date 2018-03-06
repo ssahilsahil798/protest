@@ -1,4 +1,4 @@
-asgi-redis==1.4.3
+
 asgiref==1.1.2
 astroid==1.6.1
 attrs==17.4.0
@@ -7,7 +7,7 @@ Automat==0.6.0
 backports.functools-lru-cache==1.5
 backports.shutil-get-terminal-size==1.0.0
 bleach==2.1.2
-channels==1.1.8
+
 configparser==3.5.0
 constantly==15.1.0
 coverage==4.5.1

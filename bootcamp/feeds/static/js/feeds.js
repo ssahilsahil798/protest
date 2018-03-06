@@ -4,17 +4,17 @@ $(function () {
     // WebSocket connection management block.
     // Correctly decide between ws:// and wss://
     var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-    var ws_path = ws_scheme + '://' + window.location.host + "/feeds/";
+    var ws_path = ws_scheme + '://' + window.location.host + ":8000" + "/feeds/ws";
     var webSocket = new channels.WebSocketBridge();
     webSocket.connect(ws_path);
 
     // Helpful debugging
     webSocket.socket.onopen = function () {
-        console.log("Connected to feeds stream");
+        console.log("Connected to feeds stsdfsdfream");
     };
 
     webSocket.socket.onclose = function () {
-        console.log("Disconnected from feeds stream");
+        console.log("Disconnected from feeds strsdfsfsdeam");
     };
 
     webSocket.listen(function(event) {

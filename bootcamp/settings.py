@@ -132,7 +132,7 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 TAGGIT_CASE_INSENSITIVE = True
 
 # REDIS setup
-REDIS_URL = config('REDIS_URL', default=('localhost', 6379))
+REDIS_URL = config('REDIS_URL', default=('0.0.0.0', 6379))
 # Channels configuration
 
 CHANNEL_LAYERS = {
