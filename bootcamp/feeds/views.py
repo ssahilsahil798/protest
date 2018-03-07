@@ -1,5 +1,5 @@
+from __future__ import unicode_literals
 import json
-
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import (HttpResponse, HttpResponseBadRequest,
@@ -11,7 +11,6 @@ from django.template.loader import render_to_string
 from bootcamp.activities.models import Activity
 from bootcamp.decorators import ajax_required
 from bootcamp.feeds.models import Feed
-
 FEEDS_NUM_PAGES = 10
 
 
@@ -49,16 +48,19 @@ def load(request):
         all_feeds = all_feeds.filter(user__id=feed_source)
 
     paginator = Paginator(all_feeds, FEEDS_NUM_PAGES)
+
     try:
         feeds = paginator.page(page)
 
     except PageNotAnInteger:  # pragma: no cover
+
         return HttpResponseBadRequest()
 
     except EmptyPage:
         feeds = []
 
     html = ''
+
     csrf_token = (csrf(request)['csrf_token'])
     for feed in feeds:
         html = '{0}{1}'.format(html,
@@ -68,6 +70,7 @@ def load(request):
                                                     'user': request.user,
                                                     'csrf_token': csrf_token
                                                     }))
+        print "reached at function load"
 
     return HttpResponse(html)
 

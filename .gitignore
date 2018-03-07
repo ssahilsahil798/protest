@@ -58,7 +58,10 @@ docs/_build/
 *.sqlite3
 media/
 
-
+.env
+bootcamp/settings.py
+dump.rdb
+requirements.txt
 
 venv_bootcamp/
 staticfiles
