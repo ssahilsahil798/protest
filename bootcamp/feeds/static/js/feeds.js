@@ -4,7 +4,7 @@ $(function () {
     // WebSocket connection management block.
     // Correctly decide between ws:// and wss://
     var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-    var ws_path = ws_scheme + '://' + window.location.host + ":8000" + "/feeds/ws";
+    var ws_path = ws_scheme + '://' + window.location.host + "/feeds";
     var webSocket = new channels.WebSocketBridge();
     webSocket.connect(ws_path);
 
@@ -68,7 +68,7 @@ $(function () {
     });
 
     $(".btn-cancel-compose").click(function () {
-        $(".compose").slideUp();
+        //$(".compose").slideUp();
     });
 
     $(".btn-post").click(function () {
@@ -84,7 +84,7 @@ $(function () {
             cache: false,
             success: function (data) {
                 $("ul.stream").prepend(data);
-                $(".compose").slideUp();
+                //$(".compose").slideUp();
                 $(".compose").removeClass("composing");
                 hide_stream_update();
             }
