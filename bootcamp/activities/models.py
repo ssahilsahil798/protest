@@ -125,9 +125,9 @@ class Notification(models.Model):
     _USER_LOGOUT_TEMPLATE = '<a href="/{0}/">{1}</a> has just logged out.'  # noqa: E501
 
     from_user = models.ForeignKey(
-        User, related_name='fromuser', on_delete=models.CASCADE)
+        User, related_name='+', on_delete=models.CASCADE)
     to_user = models.ForeignKey(
-        User, related_name='usernoti', on_delete=models.CASCADE)
+        User, related_name='+', on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     feed = models.ForeignKey(
         'feeds.Feed', null=True, blank=True, on_delete=models.CASCADE)
