@@ -15,6 +15,7 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <!-- For Ajax Search suggestion -->
 <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -31,6 +32,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="{% static 'channels/js/websocketbridge.js' %}" type="text/javascript"></script>
     <script src="{% static 'js/bootcamp.js' %}"></script>
+
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <script src="{% static 'js/script.js' %}"></script>
     {% block head %}{% endblock %}
   </head>
   <body>
@@ -102,6 +106,28 @@
           {% endblock main %}
         </div>
       </main>
+
+    <div class="chat_box">
+    <div class="chat_head"> Chat Box</div>
+    <div class="chat_body"> 
+    <div class="user"> Krishna Teja</div>
+    </div>
+    </div>
+
+      <div class="msg_box" style="right:290px">
+        <div class="msg_head">Krishna Teja
+        <div class="close">x</div>
+        </div>
+        <div class="msg_wrap">
+          <div class="msg_body">
+            <div class="msg_a">This is from A </div>
+            <div class="msg_b">This is from B, and its amazingly kool nah... i know it even i liked it :)</div>
+            <div class="msg_a">Wow, Thats great to hear from you man </div> 
+            <div class="msg_push"></div>
+          </div>
+        <div class="msg_footer"><textarea class="msg_input" rows="4"></textarea></div>
+      </div>
+      </div>
       <script src="{% static 'js/notifications.js' %}"></script>
     {% endblock body %}
     <script src="{% static 'js/ga.js' %}"></script>
