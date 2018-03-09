@@ -9,6 +9,8 @@ from django.template.context_processors import csrf
 from django.template.loader import render_to_string
 
 from bootcamp.activities.models import Activity
+from bootcamp.activities.models import Notification
+from django.contrib.auth.models import User
 from bootcamp.decorators import ajax_required
 from bootcamp.feeds.models import Feed
 FEEDS_NUM_PAGES = 10
@@ -23,11 +25,18 @@ def feeds(request):
     from_feed = -1
     if feeds:
         from_feed = feeds[0].id
+    userhere = request.user
+
+    notifications = userhere.usernoti.all().exclude(is_read=True)
+    print notifications
+  
 
     return render(request, 'feeds/feeds.html', {
         'feeds': feeds,
         'from_feed': from_feed,
-        'page': 1
+        'page': 1,
+        'notifications': notifications
+        # 'notifications': notifications
     # 'likers': likers
         })
 
@@ -70,7 +79,7 @@ def load(request):
                                                     'user': request.user,
                                                     'csrf_token': csrf_token
                                                     }))
-        print "reached at function load"
+        # print "reached at function load"
 
     return HttpResponse(html)
 
