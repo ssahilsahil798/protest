@@ -14,9 +14,10 @@ ul.stream li:last-child {
 }
 
 ul.stream li a img.user {
-  width: 60px;
+  width: 20%;
   border-radius: 100px;
   float: left;
+
 }
 
 ul.stream li div.post {

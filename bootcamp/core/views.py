@@ -2,6 +2,8 @@ import os
 import json
 
 from PIL import Image
+from django.http import (HttpResponse, HttpResponseBadRequest,
+                         HttpResponseForbidden)
 
 from django.conf import settings as django_settings
 from django.contrib import messages
@@ -19,6 +21,8 @@ from bootcamp.articles.models import Article, ArticleComment
 from bootcamp.questions.models import Question, Answer
 from bootcamp.activities.models import Activity
 from bootcamp.messenger.models import Message
+from bootcamp.decorators import ajax_required
+from bootcamp.authentication.models import Profile, Friendship
 
 
 def home(request):
@@ -47,6 +51,7 @@ def network(request):
 
 @login_required
 def profile(request, username):
+    user = request.user.username
     page_user = get_object_or_404(User, username=username)
     all_feeds = Feed.get_feeds().filter(user=page_user)
     paginator = Paginator(all_feeds, FEEDS_NUM_PAGES)
@@ -65,6 +70,9 @@ def profile(request, username):
     messages_count = Message.objects.filter(
         Q(from_user=page_user) | Q(user=page_user)).count()
     data, datepoints = Activity.daily_activity(page_user)
+    #friendship = Friendship.objects.filter(from_user=page_user)
+    
+    friendship = "No friends added yet"
     data = {
         'page_user': page_user,
         'feeds_count': feeds_count,
@@ -81,9 +89,160 @@ def profile(request, username):
         'line_data': data,
         'feeds': feeds,
         'from_feed': from_feed,
-        'page': 1
+        'page': 1,
+        'friendship': friendship,
+
         }
     return render(request, 'core/profile.html', data)
+
+
+@login_required
+@ajax_required
+def friendrequest(request, username):
+    from_user = request.user
+    action = request.POST.get('action')
+    friendship = Friendship.objects.filter(Q(to_user=request.user) | Q(from_user=User.objects.get(username=username)))
+    print "check.sfsldfsldkfjsldkfjsldkfjslk"
+    if friendship.count() == 0:
+        friendship = Friendship.objects.filter(Q(from_user=request.user) | Q(to_user=User.objects.get(username=username)))
+        if friendship.count() == 0:
+
+                if(username != request.user):
+                    print "adding friendship"
+
+                    to_user = User.objects.get(username=username)
+                    print username
+
+                    frnd = Friendship.objects.create(from_user=request.user, to_user=to_user, accepted=False)
+                    frnd.save()
+                    friendship = Friendship.objects.filter(Q(from_user=request.user) | Q(to_user=to_user))
+        else:
+            #frienship request exist
+            #if friend request is sent by request.user then delete friendship
+            
+            if friendship[0].from_user == request.user:
+                frnd = friendship[0]
+                frnd.delete()
+                frnd = None
+                
+
+            #if friend request is sent by username then accept friendship if not accepted 
+            #if friend request is accepted then delete friendship
+            else:
+                if friendship[0].accepted == True:
+                    frnd = friendship[0]
+                    frnd.delete()
+                    print "reaching 1 st"
+                    frnd = None
+                
+                else:
+                    print request.action
+                    if action == "accept":
+                        print "reached right statement"
+                        frnd = friendship[0]
+                        frnd.accepted = True
+                        frnd.save()
+                    else:
+                        print "reached wrong statement"
+                        frnd = friendship[0]
+                        frnd.delete()
+                        frnd = None
+
+
+    else:
+        #if friend request is sent by username then accept friendship if not accepted 
+        #if friend request is accepted then delete friendship
+        
+        if friendship[0].from_user == request.user:
+            frnd = friendship[0]
+            frnd.delete()
+            print "reahed out else before 1 st"
+            frnd = None
+            
+
+        else:
+            if friendship[0].accepted == True:
+                    frnd = friendship[0]
+                    print "reached outer else 1st"
+                    frnd.delete()
+                    frnd = None
+
+            
+
+            else:
+                if action == "accept":
+
+                    frnd = friendship[0]
+                    frnd.accepted = True
+                    print "reached outer else 2 nd"
+                    frnd.save()
+                else:
+                    frnd = friendship[0]
+                    frnd.delete()
+                    frnd = None
+                    print action
+                    print "reached outer else 3rd"
+
+
+        #if friend request is sent by username then delete friendship
+
+
+    if friendship.count() != 0:
+        print friendship[0].from_user.username + "  to_user - " + friendship[0].to_user.username
+        button =""
+        button2 = ""
+        if(frnd.from_user == request.user and frnd.accepted == False):
+            button = "Cancel Request"
+        elif frnd.accepted == True and frnd.from_user == request.user:
+            button = "Remove Friend"
+        elif frnd.accepted == True and frnd.from_user != request.user:
+            button = "Remove Friend"
+        elif frnd.accepted == False and frnd.from_user != request.user:
+            button = "Add Friend"
+            button2 = "Ignore"
+        data = {
+            'from_user': str(frnd.from_user.username),
+            'to_user': frnd.to_user.username,
+            'accepted': frnd.accepted,
+            'button': button,
+            'button2': button2
+            }
+        print data
+    else:
+        data = {
+            'button': "Add Friend",
+            }
+
+    json_data = json.dumps(data)
+
+    return HttpResponse(json_data)
+
+@login_required
+@ajax_required
+def frndstatus(request, username):
+    user = request.user
+    print "reached frndstatus views.py"
+    profileuser = User.objects.get(username=username)
+    frndship = Friendship.objects.filter(Q(to_user = user) | Q(from_user=user))
+    if frndship.count() == 0:
+        data = {"button":"Add Friend"}
+    else:
+        if frndship[0].accepted == True and frndship[0].from_user.username == user.username:
+            data = {"button": "Remove Friend"}
+
+        elif frndship[0].accepted == True and frndship[0].from_user.username == username:
+            data = {"button": "Remove Friend"}
+
+        elif frndship[0].accepted == False and frndship[0].from_user.username == user.username:
+            data = {"button": "Cancel Request"}
+        else:
+            data = {"button":"Add Friend", "button2": "Ignore"}
+            print str(frndship[0].accepted) + " |and from_user=  " + frndship[0].from_user.username
+
+    json_data = json.dumps(data)
+
+    return HttpResponse(json_data)
+
 
 
 @login_required

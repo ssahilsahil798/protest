@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'bootcamp.feeds',
     'bootcamp.messenger',
     'bootcamp.questions',
+    'bootcamp.liveuser',
     'bootcamp.search',
     'taggit',
     'channels',

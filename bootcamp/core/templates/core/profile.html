@@ -8,16 +8,135 @@
   <link href="{% static 'css/profile.css' %}" rel="stylesheet">
   <link href="{% static 'css/feeds.css' %}" rel="stylesheet">
   <link href="{% static 'css/top_tiles.css' %}" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="{% static 'js/feeds.js' %}"></script>
   <script src="{% static 'js/jquery.bullseye-1.0-min.js' %}"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js" type="text/javascript"></script>
+ 
 {% endblock head %}
 {% block extrahead %}
 
 {% endblock extrahead %}
 {% block main %}
-  <div class="page-header">
+  <div class="container">
+  <div class="div1">
     <h1>{{ page_user.profile.get_screen_name }} {% if page_user.get_full_name %}<small>({{ page_user.username }})</small>{% endif %}</h1>
+  </div> 
+  <div class = "div2">
+  <button class="frndrequest frnd-button frndadd" id="frndadd1" type="button" onclick="myFunction(this)">Add Friend</button>
+  <button class="frndrequest frnd-button frndignore" id="frndignore" type="button" onclick="myFunctionIgnore(this)">Ignore</button>
+
+  <script>
+
+  $(function(){
+
+      var csrf = "{{ csrf_token }}";
+      var username = "{{ page_user.username }}";
+      var user = "{{ user.username }}";
+      if (user != username) {
+        $('.frndadd').show();
+       
+        console.log("good");
+            $.ajax({
+            url: "/" + username + "/frndstatus",
+             data: {
+                'username': "{{ page_user.username }}",
+                'csrfmiddlewaretoken': csrf,
+               
+            },
+            type: 'post',
+            cache: false,
+            success: function (data) {
+
+              var json = $.parseJSON(data);
+              
+              $("#frndadd1").html(json['button']);
+              if(json['button2'] === "Ignore"){
+                $("#frndignore").show();
+              }else{
+                $("#frndignore").hide();
+              }
+              // alert(data);
+
+                //$(".compose").slideUp();
+           
+                }
+            });
+
+        }
+
+
+
+  });
+
+
+
+
+  function myFunction(x) {
+
+      var csrf = "{{ csrf_token }}";
+      var username = "{{ page_user.username }}";
+      var user = "{{ user.username }}";
+
+      $.ajax({
+            url: "/" + username + "/friendrequest",
+             data: {
+                'username': "{{ page_user.username }}",
+                'csrfmiddlewaretoken': csrf,
+                'action': 'accept'
+               
+            },
+            type: 'post',
+            cache: false,
+            success: function (data) {
+
+              var json = $.parseJSON(data);   
+              $("#frndadd1").html(json['button']);
+              if(json['button2'] === "Ignore"){
+                $("#frndignore").show();
+              }else{
+                $("#frndignore").hide();
+              }
+                // alert(data);
+                //$(".compose").slideUp();
+           
+            }
+        });
+  }
+
+  function myFunctionIgnore(x) {
+
+      var csrf = "{{ csrf_token }}";
+      var username = "{{ page_user.username }}";
+      console.log("{{ user.username }}");
+
+      $.ajax({
+            url: "/" + username + "/friendrequest",
+             data: {
+                'username': "{{ page_user.username }}",
+                'csrfmiddlewaretoken': csrf,
+                'action': ''
+               
+            },
+            type: 'post',
+            cache: false,
+            success: function (data) {
+
+              var json = $.parseJSON(data);    
+              $("#frndadd1").html(json['button']);
+              if(json['button2'] === "Ignore"){
+                $("#frndignore").show();
+              }else{
+                $("#frndignore").hide();
+              }
+                // alert(data);
+                //$(".compose").slideUp();
+           
+            }
+        });
+  }
+  </script>
+  </div>
   </div>
   <div class="profile">
     <div class="row tile_count">

@@ -3,7 +3,7 @@
 
 
 <li feed-id="{{ feed.pk }}" csrf="{{ csrf_token }}">
-  <div class="feed-container">
+  <div class="feed-container clearfix">
     <a href="{% url 'profile' feed.user.username %}"><img
         src="{{ feed.user.profile.get_picture }}" class="user"></a>
     <div class="post">

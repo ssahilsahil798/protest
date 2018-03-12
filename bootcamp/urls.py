@@ -4,6 +4,7 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
 from bootcamp.activities import views as activities_views
+from bootcamp.liveuser import views as liveuser_views
 from bootcamp.authentication import views as bootcamp_auth_views
 from bootcamp.core import views as core_views
 from bootcamp.search import views as search_views
@@ -26,17 +27,21 @@ urlpatterns = [
     url(r'^questions/', include('bootcamp.questions.urls')),
     url(r'^articles/', include('bootcamp.articles.urls')),
     url(r'^messages/', include('bootcamp.messenger.urls')),
+    url(r'^liveuser/$', liveuser_views.user_list, name='user_list'),
     url(r'^notifications/$', activities_views.notifications,
         name='notifications'),
     url(r'^notifications/last/$', activities_views.last_notifications,
         name='last_notifications'),
     url(r'^notifications/check/$', activities_views.check_notifications,
         name='check_notifications'),
+    url(r'^friendrequests/last/$', activities_views.last_friendrequests, name='last_friendrequests'),
     # For autocomplete suggestions
     url(r'^autocomplete/$',
         search_views.get_autocomplete_suggestions, name='autocomplete'),
     url(r'^search/$', search_views.search, name='search'),
     url(r'^(?P<username>[^/]+)/$', core_views.profile, name='profile'),
+    url(r'^(?P<username>[^/]+)/friendrequest$', core_views.friendrequest, name='friendrequest'),
+    url(r'^(?P<username>[^/]+)/frndstatus$', core_views.frndstatus, name='frndstatus'),
     url(r'^i18n/', include('django.conf.urls.i18n', namespace='i18n')),
 
 ]

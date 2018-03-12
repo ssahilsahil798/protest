@@ -1,0 +1,17 @@
+{% load i18n %}
+{% load humanize %}
+
+<ul>
+  {% for request in friendrequests %}
+    <li class="clearfix">
+      <img src="{{ request.from_user.profile.get_picture }}" class="user-picture">
+      <p>{{ request|safe }}</p>
+      <p><small>{{ request.date_created|naturaltime }}</small></p>
+
+    </li>
+  {% empty %}
+    <li style="text-align: center">{% trans 'You have no new friend requests' %}</li>
+  {% endfor %}
+      <li style="text-align: center"><a href="{% url 'network' %}">{% trans 'See all' %}</a></li>
+
+ </ul>

@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 from bootcamp.activities.models import Notification
+from bootcamp.authentication.models import Friendship
 from bootcamp.decorators import ajax_required
 
 
@@ -17,6 +18,17 @@ def notifications(request):
 
     return render(request, 'activities/notifications.html',
                   {'notifications': notifications})
+
+@login_required
+@ajax_required
+def last_friendrequests(request):
+    user = request.user
+    print "reaching view"
+    frndrequests = Friendship.call_latest_frnd_requests(user)
+   
+    return render(request,
+                  'activities/frndrequests.html',
+                  {'friendrequests': frndrequests})
 
 
 @login_required

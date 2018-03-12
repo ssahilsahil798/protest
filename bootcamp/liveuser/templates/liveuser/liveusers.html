@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  <ul class="lavadebug">
+    {% for user in users %}
+      <li data-username="{{ user.username|escape }}">
+        {{ user.username|escape }}: {{ user.status }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock content %}
+
+
+{% block script %}
+  <script>
+
+
+
+            // var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+            // var ws_path = ws_scheme + '://' + window.location.host + "/liveuser";
+            // var webSocket = new channels.WebSocketBridge();
+            // webSocket.connect(ws_path);
+
+            // // Helpful debugging
+            // webSocket.socket.onopen = function () {
+            //     console.log("Connected to LIVE stream");
+            // };
+
+            // webSocket.socket.onclose = function () {
+            //     console.log("Disconnected from LIVE stream");
+            // };
+
+            // webSocket.listen(function(event) {
+            //   console.log(event);
+            //   alert(event);
+            // });
+  </script>
+{% endblock script %}

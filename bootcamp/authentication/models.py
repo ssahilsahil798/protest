@@ -11,6 +11,9 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.utils.encoding import python_2_unicode_compatible
 from django.contrib.auth import user_logged_in, user_logged_out
+from django.utils.html import escape
+from bootcamp.liveuser.models import LoggedInUser
+
 
 
 from channels import Group
@@ -148,22 +151,31 @@ class Profile(models.Model):
                 answer=answer).delete()
 
     def notify_login(self):
+        print "reached notify_login"
+        user = self.user
+        LoggedInUser.objects.get_or_create(user=user)
         Notification.objects.filter(
             notification_type=Notification.LOGGED_OUT, from_user=self.user,
             to_user=self.user).delete()
         Notification.objects.get_or_create(
             notification_type=Notification.LOGGED_IN, from_user=self.user,
             to_user=self.user)
+        self.live_status_notification("New Friend is Live")
         self.group_notification('log in')
+        
 
     def notify_logout(self):
+        user = self.user
+        LoggedInUser.objects.filter(user=user).delete()
         Notification.objects.filter(
             notification_type=Notification.LOGGED_IN, from_user=self.user,
             to_user=self.user).delete()
         Notification.objects.get_or_create(
             notification_type=Notification.LOGGED_OUT, from_user=self.user,
             to_user=self.user)
+        self.live_status_notification("Friend is Offline")
         self.group_notification('log out')
+
 
     def notify_upvoted_question(self, question):
         if self.user != question.user:
@@ -192,6 +204,15 @@ class Profile(models.Model):
             })
         })
 
+    def live_status_notification(self, activity):
+        Group('liveuser').send({
+            'text': json.dumps({
+                'username': self.user.username,
+                'activity_type': 'liveuser',
+                'activity': activity
+            })
+        })
+
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
@@ -206,6 +227,7 @@ def on_user_login(sender, **kwargs):
     Profile.objects.get(user=kwargs['user']).notify_login()
 
 
+
 def on_user_logout(sender, **kwargs):
     Profile.objects.get(user=kwargs['user']).notify_logout()
 
@@ -214,3 +236,36 @@ post_save.connect(create_user_profile, sender=User)
 post_save.connect(save_user_profile, sender=User)
 user_logged_in.connect(on_user_login, sender=User)
 user_logged_out.connect(on_user_logout, sender=User)
+
+@python_2_unicode_compatible
+class Friendship(models.Model):
+    from_user = models.ForeignKey(User, related_name="+", on_delete=models.CASCADE)
+    to_user = models.ForeignKey(User, related_name="+", on_delete=models.CASCADE)
+    date_created = models.DateTimeField(auto_now_add=True, editable=False)
+    accepted = models.BooleanField(default=False)
+
+    _REQUEST_TEMPLATE = '<a href="/{0}/">{1}</a> Sent you a friend request.'  # noqa: E501
+
+    def __str__(self):
+    
+        return self._REQUEST_TEMPLATE.format(
+            escape(self.from_user.username),
+            escape(self.from_user.profile.get_screen_name())
+            )
+
+    class Meta:
+        unique_together = ('from_user', 'to_user',)
+
+
+    @staticmethod
+    def call_latest_frnd_requests(user):
+        frnd_requests = Friendship.objects.filter(
+            to_user=user, accepted=False)
+     
+
+        return frnd_requests[:5]
+
+
+
+
+

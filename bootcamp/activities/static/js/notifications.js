@@ -1,4 +1,5 @@
 $(function () {
+    
     $('#notifications').popover({html: true, content: 'Loading...', trigger: 'manual'});
 
     $("#notifications").click(function () {
@@ -39,6 +40,7 @@ $(function () {
     webSocket.listen(function(event) {
         if (event.activity_type === "notification") {
             $("#notifications").addClass("new-notifications");
+            console.log("new notification");
         } else if (event.activity_type === "message") {
             if (currentUser == event.receiver) {
                 $("#unread-count").show();
