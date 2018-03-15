@@ -1,19 +1,59 @@
-{% extends 'base.html' %}
+{% block head %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+{% endblock head %}
+
+  
+
 
 {% block content %}
 
-  <ul class="lavadebug">
-    {% for user in users %}
+
+
+{% for user in users %}
+<div class="itemuser" id="data_append"> 
+    {{ user.username|escape }}
+</div>
+ 
+{% endfor %}
+
+
+<!-- 
+ <div class="msg_box" style="right:290px; display:none;">
+    <div class="msg_head">USER
+    <div class="close">x</div>
+    </div>
+    <div class="msg_wrap">
+      <div class="msg_body">
+        <div class="msg_a"> Iterate Msg Here </div>
+        <div class="msg_push"></div>
+      </div>
+    <div class="msg_footer"><textarea class="msg_input" rows="4"></textarea></div>
+  </div>
+  </div> -->
+
+<!--   <ul class="lavadebug">
       <li data-username="{{ user.username|escape }}">
-        {{ user.username|escape }}: {{ user.status }}
       </li>
-    {% endfor %}
-  </ul>
+  </ul> -->
 {% endblock content %}
 
 
 {% block script %}
   <script>
+
+        // $('.user').click(function(){
+        //   alert("clcik");
+        // var newElem = 
+        //  '<div class="msg_box" style="right:80%"><div class="msg_head">USER<div class="close" id="itemclose">x</div></div><div class="msg_wrap"><div class="msg_body"><div class="msg_a"></div><div class="msg_push"></div></div><div class="msg_footer"><textarea class="msg_input" rows="4"></textarea></div></div></div>';
+        //         $('.msg_wrap').show();
+        //         $('.msg_box').show();
+        //         $("#msg_container").append(newElem);
+        //         closeEvent();
+        //         minEvent();
+        //     });
+
+      
+
 
 
 
@@ -24,7 +64,7 @@
 
             // // Helpful debugging
             // webSocket.socket.onopen = function () {
-            //     console.log("Connected to LIVE stream");
+            //     console.log("Connected to LIVE stream okokokfdfgdfgdfg");
             // };
 
             // webSocket.socket.onclose = function () {

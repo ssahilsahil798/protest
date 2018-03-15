@@ -101,10 +101,11 @@ def profile(request, username):
 def friendrequest(request, username):
     from_user = request.user
     action = request.POST.get('action')
-    friendship = Friendship.objects.filter(Q(to_user=request.user) | Q(from_user=User.objects.get(username=username)))
     print "check.sfsldfsldkfjsldkfjsldkfjslk"
+    friendship = Friendship.objects.filter(to_user=request.user, from_user=User.objects.get(username=username))
     if friendship.count() == 0:
-        friendship = Friendship.objects.filter(Q(from_user=request.user) | Q(to_user=User.objects.get(username=username)))
+        friendship = Friendship.objects.filter(from_user=request.user, to_user=User.objects.get(username=username))
+        print friendship.count()
         if friendship.count() == 0:
 
                 if(username != request.user):
@@ -115,7 +116,8 @@ def friendrequest(request, username):
 
                     frnd = Friendship.objects.create(from_user=request.user, to_user=to_user, accepted=False)
                     frnd.save()
-                    friendship = Friendship.objects.filter(Q(from_user=request.user) | Q(to_user=to_user))
+                    frnd.group_notification("frndrequest")
+                    friendship = Friendship.objects.filter(from_user=request.user, to_user=to_user)
         else:
             #frienship request exist
             #if friend request is sent by request.user then delete friendship
@@ -223,21 +225,30 @@ def frndstatus(request, username):
     user = request.user
     print "reached frndstatus views.py"
     profileuser = User.objects.get(username=username)
-    frndship = Friendship.objects.filter(Q(to_user = user) | Q(from_user=user))
+    frndship = Friendship.objects.filter(to_user = user, from_user=profileuser)
+    if frndship.count()==0:
+        frndship = Friendship.objects.filter(to_user = profileuser, from_user=user)
+        print frndship
     if frndship.count() == 0:
         data = {"button":"Add Friend"}
+        print "empty set"
+        print frndship
     else:
         if frndship[0].accepted == True and frndship[0].from_user.username == user.username:
             data = {"button": "Remove Friend"}
+            print "1 st"
 
         elif frndship[0].accepted == True and frndship[0].from_user.username == username:
             data = {"button": "Remove Friend"}
+            print "2nd "
 
         elif frndship[0].accepted == False and frndship[0].from_user.username == user.username:
             data = {"button": "Cancel Request"}
+            print "3 rd "
         else:
             data = {"button":"Add Friend", "button2": "Ignore"}
-            print str(frndship[0].accepted) + " |and from_user=  " + frndship[0].from_user.username
+            print "else 4 th"
+            
 
     json_data = json.dumps(data)
 

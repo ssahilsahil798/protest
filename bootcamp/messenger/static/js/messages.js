@@ -70,6 +70,7 @@ $(function () {
 
     // onmessage management.
     webSocket.listen(function(event) {
+        console.log(event);
         switch (event.activity_type) {
             case "message":
                 if (event.sender === activeUser) {

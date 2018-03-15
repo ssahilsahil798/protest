@@ -87,6 +87,10 @@ main .container {
   color: #e03a3a;
 }
 
+#friendrequests.new-frndrequest {
+  color: #e03a3a;
+}
+
 .popover {
   max-width: 350px;
   width: 350px;
@@ -126,9 +130,6 @@ main .container {
 
 
 
-#friendrequests.new-friendrequests {
-  color: #428bca;
-}
 
 
 

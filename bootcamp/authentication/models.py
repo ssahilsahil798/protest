@@ -153,27 +153,25 @@ class Profile(models.Model):
     def notify_login(self):
         print "reached notify_login"
         user = self.user
-        LoggedInUser.objects.get_or_create(user=user)
         Notification.objects.filter(
             notification_type=Notification.LOGGED_OUT, from_user=self.user,
             to_user=self.user).delete()
         Notification.objects.get_or_create(
             notification_type=Notification.LOGGED_IN, from_user=self.user,
             to_user=self.user)
-        self.live_status_notification("New Friend is Live")
+        self.live_status_notification(True)
         self.group_notification('log in')
         
 
     def notify_logout(self):
         user = self.user
-        LoggedInUser.objects.filter(user=user).delete()
         Notification.objects.filter(
             notification_type=Notification.LOGGED_IN, from_user=self.user,
             to_user=self.user).delete()
         Notification.objects.get_or_create(
             notification_type=Notification.LOGGED_OUT, from_user=self.user,
             to_user=self.user)
-        self.live_status_notification("Friend is Offline")
+        self.live_status_notification(False)
         self.group_notification('log out')
 
 
@@ -208,8 +206,8 @@ class Profile(models.Model):
         Group('liveuser').send({
             'text': json.dumps({
                 'username': self.user.username,
-                'activity_type': 'liveuser',
-                'activity': activity
+                'activity_type': 'liveuser_noti',
+                'is_logged_in': activity
             })
         })
 
@@ -264,6 +262,20 @@ class Friendship(models.Model):
      
 
         return frnd_requests[:5]
+
+
+
+    def group_notification(self, activity):
+        print "reaching models notification" 
+        print self.to_user.username
+        Group('notifications').send({
+            'text': json.dumps({
+                'from_user': self.from_user.username,
+                'to_user': self.to_user.username,
+                'activity_type': 'frndrequest',
+                'activity': activity
+            })
+        })
 
 
 

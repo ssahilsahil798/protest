@@ -33,6 +33,28 @@ def inbox(request):
 
 
 @login_required
+@ajax_required
+def msgpopup(request, username):
+    conversations = Message.get_conversations(user=request.user)
+    users_list = User.objects.filter(
+        is_active=True).exclude(username=request.user).order_by('username')
+    active_conversation = username
+    messages = Message.objects.filter(user=request.user,
+                                      conversation__username=username)
+    messages.update(is_read=True)
+    for conversation in conversations:
+        if conversation['user'].username == username:
+            conversation['unread'] = 0
+
+    return render(request, 'messenger/popup_message.html', {
+        'messages': messages,
+        'conversations': conversations,
+        'users_list': users_list,
+        'active': active_conversation
+        })
+
+
+@login_required
 def messages(request, username):
     conversations = Message.get_conversations(user=request.user)
     users_list = User.objects.filter(
