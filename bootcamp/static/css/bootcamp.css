@@ -1,5 +1,26 @@
 @import url(https://fonts.googleapis.com/css?family=Audiowide);
 
+@media screen and (max-width: 600px) {
+  .chat_box {
+    visibility: hidden;
+    clear: both;
+    float: left;
+    margin: 10px auto 5px 20px;
+    width: 28%;
+    display: none;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .msg_area {
+    visibility: hidden;
+    clear: both;
+    float: left;
+    margin: 10px auto 5px 20px;
+    width: 28%;
+    display: none;
+  }
+}
 body {
   padding-top: 70px;
 }

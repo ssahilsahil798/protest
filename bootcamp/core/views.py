@@ -23,7 +23,15 @@ from bootcamp.activities.models import Activity
 from bootcamp.messenger.models import Message
 from bootcamp.decorators import ajax_required
 from bootcamp.authentication.models import Profile, Friendship
+from django.core.files.storage import default_storage as storage
+from django.core.files.base import ContentFile
+import storages.backends.s3boto3
 
+protected_storage = storages.backends.s3boto3.S3Boto3Storage(
+  acl='private',
+  querystring_auth=True,
+  querystring_expire=600, # 10 minutes, try to ensure people won't/can't share
+)
 
 def home(request):
     if request.user.is_authenticated():
@@ -320,28 +328,42 @@ def password(request):
 @login_required
 def upload_picture(request):
     try:
-        profile_pictures = django_settings.MEDIA_ROOT + '/profile_pictures/'
-        if not os.path.exists(profile_pictures):
-            os.makedirs(profile_pictures)
+        # profile_pictures = django_settings.MEDIA_ROOT + '/profile_pictures/'
+        # if not os.path.exists(profile_pictures):
+        #     os.makedirs(profile_pictures)
+        # import storages.backends.s3boto3
 
-        f = request.FILES['picture']
-        filename = profile_pictures + request.user.username + '_tmp.jpg'
-        with open(filename, 'wb+') as destination:
-            for chunk in f.chunks():
-                destination.write(chunk)
+        # protected_storage = storages.backends.s3boto3.S3Boto3Storage(
+        #   acl='private',
+        #   querystring_auth=True,
+        #   querystring_expire=600, # 10 minutes, try to ensure people won't/can't share
+        # )
+        # f = request.FILES['picture']
+        # filename = storage.open('/media/profile_pictures/' + request.user.username + '_tmp.jpg', 'w')
 
-        im = Image.open(filename)
-        width, height = im.size
-        if width > 350:
-            new_width = 350
-            new_height = (height * 350) / width
-            new_size = new_width, new_height
-            im.thumbnail(new_size, Image.ANTIALIAS)
-            im.save(filename)
+        
+        # storage.save('/media/profile_pictures/' + request.user.username + '_tmp.jpg', f)
+        # filename.close()
+        # with filename as destination:
+        #     for chunk in f.chunks():
+        #         destination.write(chunk)
+        # filename.close()
+
+        # f.save(filename, "JPEG")
+        # filename.close()
+        # im = Image.open(filename)
+        # width, height = im.size
+        # if width > 350:
+        #     new_width = 350
+        #     new_height = (height * 350) / width
+        #     new_size = new_width, new_height
+        #     im.thumbnail(new_size, Image.ANTIALIAS)
+        #     im.save(filename)
 
         return redirect('/settings/picture/?upload_picture=uploaded')
 
     except Exception:
+        print "eroror slkdfj sdkfj sldkfj sldkfj"
         return redirect('/settings/picture/')
 
 

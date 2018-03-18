@@ -8,6 +8,8 @@ from bootcamp.liveuser import views as liveuser_views
 from bootcamp.authentication import views as bootcamp_auth_views
 from bootcamp.core import views as core_views
 from bootcamp.search import views as search_views
+from django.conf.urls import url
+from bootcamp.files.views import FilePolicyAPI, FileUploadCompleteHandler
 
 urlpatterns = [
     url(r'^$', core_views.home, name='home'),
@@ -43,6 +45,8 @@ urlpatterns = [
     url(r'^(?P<username>[^/]+)/friendrequest$', core_views.friendrequest, name='friendrequest'),
     url(r'^(?P<username>[^/]+)/frndstatus$', core_views.frndstatus, name='frndstatus'),
     url(r'^i18n/', include('django.conf.urls.i18n', namespace='i18n')),
+    url(r'^api/files/policy/$', FilePolicyAPI.as_view(), name='upload-policy'),
+    url(r'^api/files/complete/$', FilePolicyAPI.as_view(), name='upload-complete'),
 
 ]
 

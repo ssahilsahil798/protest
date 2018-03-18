@@ -115,6 +115,27 @@ def check(request):
     count = feeds.count()
     return HttpResponse(count)
 
+@login_required
+@ajax_required
+def create_post(request):
+    last_feed = request.POST.get('last_feed')
+    user = request.user
+    csrf_token = (csrf(request)['csrf_token'])
+    feed = Feed()
+    
+    feed.user = user
+    post = request.POST['post']
+    post = post.strip()
+    if len(post) > 0:
+        feed.post = post[:255]
+        feed.save()
+    post_id = feed.id
+    print post_id
+    html = _html_feeds(last_feed, user, csrf_token)
+    data = {"post_id": post_id}
+    data = json.dumps(data)
+    return HttpResponse(data, content_type="application/json")
+
 
 @login_required
 @ajax_required
@@ -123,15 +144,19 @@ def post(request):
     user = request.user
     csrf_token = (csrf(request)['csrf_token'])
     feed = Feed()
+    
     feed.user = user
     post = request.POST['post']
     post = post.strip()
     if len(post) > 0:
         feed.post = post[:255]
         feed.save()
-
+    post_id = feed.id
+    print post_id
     html = _html_feeds(last_feed, user, csrf_token)
-    return HttpResponse(html)
+    data = {"html": str(html), "post_id": post_id}
+    data = json.dumps(data)
+    return HttpResponse(data, content_type="application/json")
 
 
 @login_required
