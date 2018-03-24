@@ -171,16 +171,20 @@ ul.stream li div.post div.interaction a {
 /*IMAGE GALLERY CODE START BELOW */
 
 
+
+
 .gallery {
   width: 100%;
   height: 100%;
+
   border-radius: 3px;
   overflow: hidden;
+  float: left;
   position: relative;
 }
 .img-c {
   width: 200px;
-  height: 350px;
+  min-height: 300px;
   float: left;
   margin:10px;
   position: relative;
@@ -191,6 +195,7 @@ ul.stream li div.post div.interaction a {
   position: absolute;
   width: 100%;
   height: 100%;
+  float: left;
   background-size: cover;
   background-position: center;
   cursor: pointer;

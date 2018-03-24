@@ -1,6 +1,13 @@
 {% load i18n %}
+{% load static from  staticfiles %}
 {% load humanize %}
 
+            <div class="fs-gal-view">
+                <h1></h1>
+                <img class="fs-gal-prev fs-gal-nav" src="{% static 'img/prev.svg' %}" alt="Previous picture" title="Previous picture" />
+                <img class="fs-gal-next fs-gal-nav" src="{% static 'img/next.svg' %}" alt="Next picture" title="Next picture" />
+                <img class="fs-gal-close" src="{% static 'img/close.svg' %}" alt="Close gallery" title="Close gallery" />
+              </div>
 
 <li feed-id="{{ feed.pk }}" csrf="{{ csrf_token }}">
   <div class="feed-container clearfix">
@@ -19,8 +26,8 @@
 
      
   </div>
-    
-    
+    <br>
+   <!--  <div class="container-img"> -->
   
 
       {% if feed.youtube_link %}
@@ -36,6 +43,7 @@
 
 
         {% if feed.feed_media %}
+        <div class="gallery"> 
           {% for item in feed.feed_media.all %}
             {% if item.file_type == ".mp4" or item.file_type == ".mkv"  or item.file_type == ".mov"  or item.file_type == "mpeg4" or item.file_type == "avi" or item.file_type == "mp3" %}
            
@@ -46,20 +54,24 @@
               <source src="{{ item.temp_path }}" type="video/mp4">
               </video>
 
-</div> 
+              </div> 
             {% else %}
-                <div class="gallery"> 
-            
-                <div class="img-w">
-                <img src="{{ item.temp_path }}" alt="" /></div>
+                
 
-                </div>
+                  <img class="fs-gal"  
+                       alt="Example Image 1" 
+                       src="{{ item.temp_path }}"
+                       data-url="{{ item.temp_path }}">
+
+
+
 
             {% endif %}
           {% endfor %}
+           </div>
         {% endif %}
       {% endif %}
-     
+     <!-- </div> -->
 
       <div class="interaction" id="interaction">
         {% if user in feed.get_likers %}

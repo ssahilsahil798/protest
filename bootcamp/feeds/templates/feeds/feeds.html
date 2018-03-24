@@ -10,9 +10,24 @@
   <script src="https://sdk.amazonaws.com/js/aws-sdk-2.211.0.min.js"></script>
   <script src="https://cdn.rawgit.com/skipser/youtube-autoresize/master/youtube-autoresizer.js"></script>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9/jquery.min.js"></script>
+
+   <script src="{% static 'js/fs-gal.js' %}"></script>
+  <link rel="stylesheet" href="{%static 'css/fs-gal.css' %}">
+
+
+                <!--    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+                  <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+                         rel = "stylesheet">
+                        <script src="//code.jquery.com/jquery.min.js"></script>
+                          -->
+                <!--    <script src = "https://code.jquery.com/jquery-1.10.2.js"></script> -->
+
+  <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
 {% endblock head %}
 
 {% block main %}
+
 
   <div class="row">
   <div class="col-md-2">
@@ -126,6 +141,8 @@
       </div>
     </div>
   </div>
+
+            
 {% endblock main %}
 {% block javascript %}
 {% endblock %}
