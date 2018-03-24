@@ -15,7 +15,52 @@
         <a href="{% url 'profile' feed.user.username %}">{{ feed.user.profile.get_screen_name }}</a>
         <small>{{ feed.date|naturaltime }}</small>
       </h3>
-      <p>{{ feed.linkfy_post|safe }}</p>
+      <p>{{ feed.linkfy_post|safe }}</p><br><br>
+
+     
+  </div>
+    
+    
+  
+
+      {% if feed.youtube_link %}
+        <div style="max-width:560px;margin:0 auto; padding:5px;">
+        <div style="position: relative;padding-bottom: 56.25%; height: 0; overflow: hidden;">
+          <iframe autostart='0' width="560" height="315" frameborder="0" allowfullscreen="" src="{{ feed.youtube_link }}?rel=0" style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; max-width: 560px; max-height: 315px;">
+            
+            </iframe>
+          </div>
+        </div>
+
+      {% else %}
+
+
+        {% if feed.feed_media %}
+          {% for item in feed.feed_media.all %}
+            {% if item.file_type == ".mp4" or item.file_type == ".mkv"  or item.file_type == ".mov"  or item.file_type == "mpeg4" or item.file_type == "avi" or item.file_type == "mp3" %}
+           
+
+
+              <div class="embed-responsive embed-responsive-16by9">
+              <video class="embed-responsive-item" controls poster="YOUR_POSTER_IMAGE.jpg">
+              <source src="{{ item.temp_path }}" type="video/mp4">
+              </video>
+
+</div> 
+            {% else %}
+                <div class="gallery"> 
+            
+                <div class="img-w">
+                <img src="{{ item.temp_path }}" alt="" /></div>
+
+                </div>
+
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endif %}
+     
+
       <div class="interaction" id="interaction">
         {% if user in feed.get_likers %}
           <a href="#" style="text-decoration: none;"
@@ -53,5 +98,5 @@
         </ol>
       </div>
     </div>
-  </div>
+
 </li>

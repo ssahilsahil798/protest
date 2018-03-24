@@ -4,6 +4,7 @@ from bootcamp.feeds import views
 
 urlpatterns = [
     url(r'^$', views.feeds, name='feeds'),
+    url(r'^tags/(?P<countrytag>[^/]+)/$', views.country_feeds, name='country_feeds'),
     url(r'^createpost/$', views.create_post, name='create_post'),
     url(r'^post/$', views.post, name='post'),
     url(r'^like/$', views.like, name='like'),

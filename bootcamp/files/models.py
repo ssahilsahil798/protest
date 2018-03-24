@@ -9,6 +9,7 @@ class FileItem(models.Model):
     feed                            = models.ForeignKey(Feed, related_name="feed_media", default=1)
     name                            = models.CharField(max_length=120, null=True, blank=True)
     path                            = models.TextField(blank=True, null=True)
+    temp_path                       = models.TextField(blank=True, null=True)
     size                            = models.BigIntegerField(default=0)
     file_type                       = models.CharField(max_length=120, null=True, blank=True)
     timestamp                       = models.DateTimeField(auto_now_add=True)

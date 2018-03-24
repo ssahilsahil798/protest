@@ -8,15 +8,14 @@
   <script src="{% static 'js/feeds.js' %}"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://sdk.amazonaws.com/js/aws-sdk-2.211.0.min.js"></script>
-  <script src="https://cdn.rawgit.com/skipser/youtube-autoresize/master/youtube-autoresizer.js"></script>
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9/jquery.min.js"></script>
 {% endblock head %}
 
 {% block main %}
 
   <div class="row">
+
   <div class="col-md-2">
-    <div id="mySidenav" class="sidenav2">
+    <div id="mySidenav text-center" class="sidenav2">
           
            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
  
@@ -29,8 +28,8 @@
 
         </div>
 
-        <div class="sidenav" style="width:18%;">
-            <ul style="list-style:none; margin-top:40px; margin-right:20%;">
+        <div class="sidenav">
+            <ul style="list-style:none; margin-top:40px;">
            {% for tag in all_tags %}
               <li>
                   <a class="btn btn-default" href="{% url 'country_feeds' tag.name %}" style="background-color:#5343b2;padding:10px;margin-top:10px;color:white;"># {{ tag.name }}</a>
@@ -41,7 +40,7 @@
         </div>
     
     </div>
-    <div class="col-md-9" style="padding-left:0px;overflow:hidden">
+    <div class="col-md-9" style="overflow:hidden;">
 
       <!-- <div class="page-header">
         <button  class="btn btn-primary pull-right btn-compose" title="{% trans 'Press Ctrl + P to compose' %}">
@@ -87,6 +86,7 @@
 
             <form role="form" id="compose-form">
               {% csrf_token %}
+              <input type="hidden" name="country_tag" id="country_tag_id" value="{{ country_tag }}">
               <input type="hidden" name="last_feed">
               <div class="form-group">
                 <textarea class="form-control" rows="3" name="post"></textarea>

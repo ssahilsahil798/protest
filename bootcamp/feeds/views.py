@@ -10,23 +10,68 @@ from django.template.loader import render_to_string
 
 from bootcamp.activities.models import Activity
 from bootcamp.decorators import ajax_required
-from bootcamp.feeds.models import Feed
-FEEDS_NUM_PAGES = 10
+from bootcamp.feeds.models import Feed, Country
+from botocore.client import Config
+import boto3
 
+FEEDS_NUM_PAGES = 10
+s3 = boto3.client('s3')
 
 @login_required
 def feeds(request):
     all_feeds = Feed.get_feeds()
     paginator = Paginator(all_feeds, FEEDS_NUM_PAGES)
     feeds = paginator.page(1)
+    all_tags = Country.objects.all()
+    s3 = boto3.client('s3')
     # likers = Feed.get_likers()
     from_feed = -1
     if feeds:
         from_feed = feeds[0].id
 
+    for item in feeds:
+        feed_files = item.feed_media.all()
+        for sas in feed_files:
+            url = s3.generate_presigned_url(ClientMethod='get_object',Params={'Bucket': 'freemedianews','Key': sas.path})
+            sas.temp_path = url
+            print sas.file_type
+            sas.save()
+
+
     return render(request, 'feeds/feeds.html', {
         'feeds': feeds,
         'from_feed': from_feed,
+        'page': 1,
+        'all_tags': all_tags,
+    # 'likers': likers
+        })
+
+
+@login_required
+def country_feeds(request,countrytag):
+    country = Country.objects.filter(name=countrytag)
+    print country[0].name
+    if country.count() == 1:
+        country_tag = country[0].name
+        print("tag " + country_tag)
+        all_feeds = Feed.objects.filter(country_tag=country)    
+    else:
+        country_tag = "global"
+        all_feeds = Feed.objects.all()
+    
+    paginator = Paginator(all_feeds, FEEDS_NUM_PAGES)
+    feeds = paginator.page(1)
+    all_tags = Country.objects.all()
+    # likers = Feed.get_likers()
+    from_feed = -1
+    if feeds:
+        from_feed = feeds[0].id
+
+    return render(request, 'feeds/feeds_country.html', {
+        'feeds': feeds,
+        'from_feed': from_feed,
+        'country_tag': country_tag,
+        'all_tags': all_tags,
         'page': 1
     # 'likers': likers
         })
@@ -60,7 +105,13 @@ def load(request):
         feeds = []
 
     html = ''
-
+    for item in feeds:
+        feed_files = item.feed_media.all()
+        for sas in feed_files:
+            url = s3.generate_presigned_url(ClientMethod='get_object',Params={'Bucket': 'freemedianews','Key': sas.path})
+            sas.temp_path = url
+            sas.save()
+            print url
     csrf_token = (csrf(request)['csrf_token'])
     for feed in feeds:
         html = '{0}{1}'.format(html,
@@ -79,6 +130,12 @@ def _html_feeds(last_feed, user, csrf_token, feed_source='all'):
     feeds = Feed.get_feeds_after(last_feed)
     if feed_source != 'all':
         feeds = feeds.filter(user__id=feed_source)
+    for item in feeds:
+        feed_files = item.feed_media.all()
+        for sas in feed_files:
+            url = s3.generate_presigned_url(ClientMethod='get_object',Params={'Bucket': 'freemedianews','Key': sas.path})
+            sas.temp_path = url
+            sas.save()
 
     html = ''
     for feed in feeds:
@@ -126,9 +183,15 @@ def create_post(request):
     feed.user = user
     post = request.POST['post']
     post = post.strip()
+    if request.POST.get('country_tag'):
+        country_name = request.POST.get('country_tag')
+        country = Country.objects.get(name = country_name)
+        feed.country_tag = country
     if len(post) > 0:
         feed.post = post[:255]
         feed.save()
+        print feed
+        print feed.country_tag
     post_id = feed.id
     print post_id
     html = _html_feeds(last_feed, user, csrf_token)
@@ -148,6 +211,9 @@ def post(request):
     feed.user = user
     post = request.POST['post']
     post = post.strip()
+
+    if request.POST.get('country_tag'):
+        feed.country_tag = request.POST.get('country_tag')
     if len(post) > 0:
         feed.post = post[:255]
         feed.save()

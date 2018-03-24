@@ -1,5 +1,8 @@
 $(function () {
+
+    var fileItemList = [];
     var page_title = $(document).attr("title");
+    check_pics();
 
     // WebSocket connection management block.
     // Correctly decide between ws:// and wss://
@@ -77,7 +80,9 @@ $(function () {
         if (last_feed == undefined) {
             last_feed = "0";
         }
+        var country_tag = $("#country_tag_id").val();
         $("#compose-form input[name='last_feed']").val(last_feed);
+
         $.ajax({
             url: '/feeds/createpost/',
             data: $("#compose-form").serialize(),
@@ -85,7 +90,6 @@ $(function () {
             cache: false,
             success: function (data) {
 
-                alert(data.post_id);
                 $("ul.stream").prepend(data.html);
                 //$(".compose").slideUp();
                 $(".compose").removeClass("composing");
@@ -104,7 +108,6 @@ $(function () {
         var myFile = verifyFileIsImageMovieAudio(item)
         if (myFile){
             uploadFile(myFile, post_id)
-            alert("sahil");
         } else {
             // alert("Some files are invalid uploads.")
         }
@@ -204,6 +207,7 @@ $(function () {
                 cache: false,
                 beforeSend: function () {
                     $(".load").show();
+                  
                 },
                 success: function (data) {
                     if (data.length > 0) {
@@ -212,12 +216,14 @@ $(function () {
                     else {
                         $("#load_feed").addClass("no-more-feeds");
                     }
+                    check_pics();
                 },
                 complete: function () {
                     $(".load").hide();
                 }
             });
         }
+
     };
 
     $("#load_feed").bind("enterviewport", load_feeds).bullseye();
@@ -371,7 +377,7 @@ getFile();
 
 
 // declare an empty array for potential uploaded files
-var fileItemList = []
+
 
 // auto-upload on file input change.
 
@@ -387,6 +393,7 @@ function verifyFileIsImageMovieAudio(file){
         case 'jpeg':
             return file  
         case 'mov':
+        case 'mkv':
         case 'mp4':
         case 'mpeg4':
         case 'avi':
@@ -460,19 +467,21 @@ function uploadFile(fileItem, post_id){
         // get AWS upload policy for each file uploaded through the POST method
         // Remember we're creating an instance in the backend so using POST is
         // needed.
+        var li = $("ul.stream").find("li");
+        var csrf = $(li).attr("csrf");
         $.ajax({
             method:"POST",
             data: {
                 filename: fileItem.name,
-                post_id: post_id
+                post_id: post_id,
+                csrfmiddlewaretoken: csrf,
             },
             url: "/api/files/policy/",
             success: function(data){
                     policyData = data
-                    alert("working here");
+
             },
             error: function(data){
-                alert("An error occured, please try again later")
             }
         }).done(function(){
             // construct the needed data using the policy for AWS
@@ -537,100 +546,91 @@ function uploadFile(fileItem, post_id){
     return fd
 }
 
-    function getFile(){
-        var policyData;
-        var newLoadingItem;
-        // get AWS upload policy for each file uploaded through the POST method
-        // Remember we're creating an instance in the backend so using POST is
-        // needed.
 
 
-        $.ajax({
-            method:"GET",
-            data: {
-                
-            },
-            url: "/api/files/policy/",
-            success: function(data){
-                    policyData = data
-                    
-                    
-                       var fd = constructFormPolicyData(policyData, fileItem)
 
-                        // use XML http Request to Send to AWS. 
-                        var xhr = new XMLHttpRequest()
-                        xhr.open('GET', policyData.url , true);
-                         xhr.send(fd);
 
-                    // var s3 = new AWS.S3();
-                    // var params = fd
 
-                   
-                    //  s3.getSignedUrl('getObject', params, function (err, url) {
-                    //         if (err) {console.log(err, err.stack); }// an error occurred
-                    //         else{
-                    //             console.log(url);          
-                                
-                    //         }
 
-                            
-                    // });
-                },
-            error: function(data){
-                alert("An error occured, please try again later")
-            }
-        }).done(function(){
-            // construct the needed data using the policy for AWS
+function check_pics(){
+
+
+$(function() {
+  $(".img-w").each(function() {
+    if($(this).parent().is(".img-c")){
+        
+    }else{
+
+
+
+    $(this).wrap("<div class='img-c'></div>")
+    let imgSrc = $(this).find("img").attr("src");
+     $(this).css('background-image', 'url(' + imgSrc + ')');
+ }
+  })
             
-            
-            // var fd = constructGetPolicyData(policyData, policyData.type)
+  
+  $(".img-c").click(function() {
+    let w = $(this).outerWidth()
+    let h = $(this).outerHeight()
+    let x = $(this).offset().left
+    let y = $(this).offset().top
+    
+    
+    $(".active").not($(this)).remove()
+    let copy = $(this).clone();
+    copy.insertAfter($(this)).height(h).width(w).delay(500).addClass("active")
+    $(".active").css('top', y - 8);
+    $(".active").css('left', x - 8);
+    
+      setTimeout(function() {
+    copy.addClass("positioned")
+  }, 0)
+    
+  }) 
+  
+})
 
-            // // use XML http Request to Send to AWS. 
-            // var xhrr = new XMLHttpRequest()
-            // alert(policyData.type);
-         
+$(document).on("click", ".img-c.active", function() {
+  let copy = $(this)
+  copy.removeClass("positioned active").addClass("postactive")
+  setTimeout(function() {
+    copy.remove();
+  }, 500)
+})
 
-            // construct callback for when uploading starts
-            // xhr.upload.onloadstart = function(event){
-            //     var inLoadingIndex = $.inArray(fileItem, fileItemList)
-            //     if (inLoadingIndex == -1){
-            //         // Item is not loading, add to inProgress queue
-            //         newLoadingItem = {
-            //             file: fileItem,
-            //             id: policyData.file_id,
-            //             order: fileItemList.length + 1
-            //         }
-            //         fileItemList.push(newLoadingItem)
-            //       }
-            //     fileItem.xhr = xhr
-            // }
-
-            // // Monitor upload progress and attach to fileItem.
-            // xhr.upload.addEventListener("progress", function(event){
-            //     if (event.lengthComputable) {
-            //      var progress = Math.round(event.loaded / event.total * 100);
-            //         fileItem.progress = progress
-            //         displayItems(fileItemList)
-            //     }
-            // })
-
-            // xhr.upload.addEventListener("load", function(event){
-            //     console.log("Complete")
-            //     // handle FileItem Upload being complete.
-            //     // fileUploadComplete(fileItem, policyData)
-
-            // })
-            // alert(policyData);
-
-            // xhrr.open('GET', policyData.url , true);
-            // xhrr.send(fd);
-            
-        })
-    }
-
+}
 
 });
 
+$(document).ready(function() {
 
+  if(typeof YOUTUBE_VIDEO_MARGIN == 10) {
+    YOUTUBE_VIDEO_MARGIN=5;
+  }
+  $('iframe').each(function(index,item) {
+    $('.video').autoplay=false;
+    $('.video').load();
+    if($(item).attr('src').match(/(https?:)?\/\/www\.youtube\.com/)) {
+      var w=$(item).attr('width');
+      var h=$(item).attr('height');
+      var ar = h/w*100;
+      $('.video').stopVideo();
+      ar=ar.toFixed(2);
+      //Style iframe    
+      $(item).css('position','absolute');
+      $(item).css('top','0');
+      $(item).css('left','0');    
+      $(item).css('width','100%');
+      $(item).css('height','100%');
+      $(item).css('max-width',w+'px');
+      $(item).css('max-height', h+'px');        
+      $(item).wrap('<div style="max-width:'+w+'px;margin:0 auto; padding:'+YOUTUBE_VIDEO_MARGIN+'px;" />');
+      $(item).wrap('<div style="position: relative;padding-bottom: '+ar+'%; height: 0; overflow: hidden;" />');
+    }else{
+        $('.video').stopVideo();
+    }
+  });
+});
 
 

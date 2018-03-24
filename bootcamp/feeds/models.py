@@ -17,10 +17,24 @@ from bootcamp.activities.models import Activity
 
 
 @python_2_unicode_compatible
+class Country(models.Model):
+    name = models.TextField(max_length=255, unique=True, default="global")
+
+    def __str__(self):
+        return self.name
+
+    def get_country_tags():
+        tags = Country.objects.all()
+        return tags
+
+
+@python_2_unicode_compatible
 class Feed(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     post = models.TextField(max_length=255)
+    youtube_link = models.TextField(max_length=255, null=True, blank=True)
+    country_tag = models.ForeignKey(Country, related_name="country", null=True, blank=True, on_delete=models.CASCADE) 
     parent = models.ForeignKey(
         'Feed', null=True, blank=True, on_delete=models.SET_NULL)
     likes = models.IntegerField(default=0)
@@ -102,3 +116,7 @@ def new_feed_added(sender, instance, created, **kwargs):
             instance.feed_log('new_feed')
 
 post_save.connect(new_feed_added, sender=Feed)
+
+
+
+

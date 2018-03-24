@@ -41,6 +41,7 @@ class FileUploadCompleteHandler(APIView):
          obj.save()
          data['id'] = obj.id
          data['saved'] = True
+         print obj.type
         return Response(data, status=status.HTTP_200_OK)
 
 class FilePolicyAPI(APIView):
@@ -87,6 +88,7 @@ class FilePolicyAPI(APIView):
                     file_extension=file_extension
 
                 )
+        file_obj.file_type = file_extension
         """
         Eventual file_upload_path includes the renamed file to the 
         Django-stored FileItem instance ID. Renaming the file is 
@@ -148,60 +150,60 @@ class FilePolicyAPI(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
-    def get(self, request, *args, **kwargs):
-    	username_str = request.user
-    	filename = Feed.objects.all()[0].feed_media.all()
-        print filename
-    	if filename.count() != 0:
-            file = filename[0]
-            file_obj_id = file.id
-            policy_expires = int(time.time()+5000)
-            upload_start_path = "{username}/{file_obj_id}/".format(
-                        username = username_str,
-                        file_obj_id=file_obj_id
-                )
-            policy_document_context = {
-                "expire": policy_expires,
-                "bucket_name": AWS_UPLOAD_BUCKET,
-                "key_name": "",
-                "acl_name": "private",
-                "content_name": "",
-                "content_length": 524288000,
-                "upload_start_path": upload_start_path,
-                }
-            policy_document = """
-            {"expiration": "2019-01-01T00:00:00Z",
-              "conditions": [
-                {"bucket": "%(bucket_name)s"},
-                ["starts-with", "$key", "%(upload_start_path)s"],
-                {"acl": "%(acl_name)s"},
-                ["starts-with", "$Content-Type", "%(content_name)s"],
-                ["starts-with", "$filename", ""],
-                ["content-length-range", 0, %(content_length)d]
-              ]
-            }
-            """ % policy_document_context
+    # def get(self, request, *args, **kwargs):
+    # 	username_str = request.user
+    # 	filename = Feed.objects.all()[0].feed_media.all()
+    #     print filename
+    # 	if filename.count() != 0:
+    #         file = filename[0]
+    #         file_obj_id = file.id
+    #         policy_expires = int(time.time()+5000)
+    #         upload_start_path = "{username}/{file_obj_id}/".format(
+    #                     username = username_str,
+    #                     file_obj_id=file_obj_id
+    #             )
+    #         policy_document_context = {
+    #             "expire": policy_expires,
+    #             "bucket_name": AWS_UPLOAD_BUCKET,
+    #             "key_name": "",
+    #             "acl_name": "private",
+    #             "content_name": "",
+    #             "content_length": 524288000,
+    #             "upload_start_path": upload_start_path,
+    #             }
+    #         policy_document = """
+    #         {"expiration": "2019-01-01T00:00:00Z",
+    #           "conditions": [
+    #             {"bucket": "%(bucket_name)s"},
+    #             ["starts-with", "$key", "%(upload_start_path)s"],
+    #             {"acl": "%(acl_name)s"},
+    #             ["starts-with", "$Content-Type", "%(content_name)s"],
+    #             ["starts-with", "$filename", ""],
+    #             ["content-length-range", 0, %(content_length)d]
+    #           ]
+    #         }
+    #         """ % policy_document_context
 
-            aws_secret = str.encode(AWS_UPLOAD_SECRET_KEY)
-            policy_document_str_encoded = str.encode(policy_document.replace(" ", ""))
-            url = 'https://{bucket}.s3-{region}.amazonaws.com/'.format(
-                            bucket=AWS_UPLOAD_BUCKET,  
-                            region=AWS_UPLOAD_REGION
-                            )
-            policy = base64.b64encode(policy_document_str_encoded)
-            signature = base64.b64encode(hmac.new(aws_secret, policy, hashlib.sha1).digest())
-            data = {
-                "policy": policy,
-                "signature": signature,
-                "key": AWS_UPLOAD_ACCESS_KEY_ID,
-                "file_bucket_path": upload_start_path,
-                "file_id": file_obj_id,
-                "filename": file.name,
-                "url": url,
-                "username": username_str.username,
-                "type": file.file_type,
-            }
-        else:
-            data={"":""}
-        return Response(data, status=status.HTTP_200_OK)
+    #         aws_secret = str.encode(AWS_UPLOAD_SECRET_KEY)
+    #         policy_document_str_encoded = str.encode(policy_document.replace(" ", ""))
+    #         url = 'https://{bucket}.s3-{region}.amazonaws.com/'.format(
+    #                         bucket=AWS_UPLOAD_BUCKET,  
+    #                         region=AWS_UPLOAD_REGION
+    #                         )
+    #         policy = base64.b64encode(policy_document_str_encoded)
+    #         signature = base64.b64encode(hmac.new(aws_secret, policy, hashlib.sha1).digest())
+    #         data = {
+    #             "policy": policy,
+    #             "signature": signature,
+    #             "key": AWS_UPLOAD_ACCESS_KEY_ID,
+    #             "file_bucket_path": upload_start_path,
+    #             "file_id": file_obj_id,
+    #             "filename": file.name,
+    #             "url": url,
+    #             "username": username_str.username,
+    #             "type": file.file_type,
+    #         }
+    #     else:
+    #         data={"":""}
+    #     return Response(data, status=status.HTTP_200_OK)
 
