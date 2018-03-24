@@ -26,7 +26,7 @@
 
      
   </div>
-    <br>
+   
    <!--  <div class="container-img"> -->
   
 
@@ -43,7 +43,7 @@
 
 
         {% if feed.feed_media %}
-        <div class="gallery"> 
+        <div class="gallery1" style="text-align:center;"> 
           {% for item in feed.feed_media.all %}
             {% if item.file_type == ".mp4" or item.file_type == ".mkv"  or item.file_type == ".mov"  or item.file_type == "mpeg4" or item.file_type == "avi" or item.file_type == "mp3" %}
            
@@ -56,12 +56,27 @@
 
               </div> 
             {% else %}
-                
-
+                {% if feed.feed_media.all.count == 1 %}
                   <img class="fs-gal"  
-                       alt="Example Image 1" 
+                       alt="" style="width:40%;" 
                        src="{{ item.temp_path }}"
                        data-url="{{ item.temp_path }}">
+                
+
+
+                {% elif feed.feed_media.all.count == 2 %}
+                  <img class="fs-gal"  
+                       alt="" style="width:40%;" 
+                       src="{{ item.temp_path }}"
+                       data-url="{{ item.temp_path }}">
+               
+
+
+                {% else %}
+
+                {% endif %}
+
+
 
 
 
@@ -72,7 +87,7 @@
         {% endif %}
       {% endif %}
      <!-- </div> -->
-
+<br>
       <div class="interaction" id="interaction">
         {% if user in feed.get_likers %}
           <a href="#" style="text-decoration: none;"

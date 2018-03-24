@@ -57,7 +57,7 @@ main .container {
     position: fixed;
     z-index: 0;
     top: 0;
-    margin-top: 40px;
+    margin-top: 20px;
     left: 0;
     background-color: #f5f5f5;
     overflow-x: hidden;

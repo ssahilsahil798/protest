@@ -146,16 +146,19 @@ $(function () {
     });
 
     $("ul.stream").on("click", ".comment", function () {
-        var post = $(this).closest(".post");
+
+        var post = $(this).parent().parent().parent();
         if ($(".comments", post).hasClass("tracking")) {
             $(".comments", post).slideUp();
             $(".comments", post).removeClass("tracking");
         }
         else {
+
             $(".comments", post).show();
             $(".comments", post).addClass("tracking");
             $(".comments input[name='post']", post).focus();
-            var feed = $(post).closest("li").attr("feed-id");
+            var feed = $(post).attr("feed-id");
+            alert("gygjh" + feed);
             $.ajax({
                 url: '/feeds/comment/',
                 data: { 'feed': feed },
@@ -555,12 +558,18 @@ function uploadFile(fileItem, post_id){
 
   function check_pics(){
 
-
+    var count = 0;
   $('.fs-gal').click(function() {
-    fsGal_DisplayImage($(this));
+    count = 0;
+    $(this).parent().children().each(function(){
+        console.log($(this).html);
+        console.log("sahil");
+        count = count +1;
+    })
+    fsGal_DisplayImage($(this), count);
   });
   //Display gallery
-  function fsGal_DisplayImage(obj) {
+  function fsGal_DisplayImage(obj, count) {
     //Clear navigation buttons
     $('.fs-gal-view > .fs-gal-prev').fadeOut();
     $('.fs-gal-view > .fs-gal-next').fadeOut();
@@ -573,16 +582,19 @@ function uploadFile(fileItem, post_id){
     var img = obj.data('url');
     $('.fs-gal-view').css('background-image', 'url('+img+')');
     //Create buttons
-    var current = $('.fs-gal').index(obj);
+    var image = $(this);
+    var current = $(this).parent().children().index(image);
     var prev = current - 1;
+    console.log(prev);
     var next = current + 1;
+    console.log("next" + next + "length" + count);
     if (prev >= 0) {
-      $('.fs-gal-view > .fs-gal-prev').data('img-index', prev);
-      $('.fs-gal-view > .fs-gal-prev').fadeIn();
+      $(this).parent('.fs-gal-view').data('img-index', prev);
+      $(this).parent('.fs-gal-view').fadeIn();
     }
-    if (next < $('.fs-gal').length) {
-      $('.fs-gal-view > .fs-gal-next').data('img-index', next);
-      $('.fs-gal-view > .fs-gal-next').fadeIn();
+    if (next < count) {
+      $(this).parent('.fs-gal-view').data('img-index', next);
+      $(this).parent('.fs-gal-view').fadeIn();
     }
     $('.fs-gal-view').fadeIn(); //Display gallery
   }
@@ -599,10 +611,10 @@ function uploadFile(fileItem, post_id){
   //Keyboard navigation
   $('body').keydown(function(e) {
     if (e.keyCode == 37) {
-      $('.fs-gal-view .fs-gal-prev').click(); //Left arrow
+      $('.fs-gal-view .fs-gal-prev'); //Left arrow
     }
     else if(e.keyCode == 39) { // right
-      $('.fs-gal-view .fs-gal-next').click(); //Right arrow
+      $('.fs-gal-view .fs-gal-next'); //Right arrow
     }
     else if(e.keyCode == 27) { // right
       $('.fs-gal-view .fs-gal-close').click(); //ESC
