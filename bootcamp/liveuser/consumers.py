@@ -10,5 +10,5 @@ def ws_connect(message):
 
 @channel_session_user
 def ws_disconnect(message):
-    Group('liveuser').discard(message.reply_channel)
-    Group('liveuser').send({'text': json.dumps({'username': message.user.username,'is_logged_in': False, 'activity_type': "liveuser_noti"})})
+	Group('liveuser').send({'text': json.dumps({'username': message.user.username,'is_logged_in': False, 'activity_type': "liveuser_noti"})})
+	Group('liveuser').discard(message.reply_channel)

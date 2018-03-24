@@ -68,9 +68,10 @@ ul.stream li div.post div.interaction a {
 }
 
 .compose {
-  border-bottom: 1px solid #eee;
-  padding-left: 15px;
-  padding-right: 15px;
+  padding-left: 0px;
+  padding-right: 0px;
+  background-color: #ffffff;
+
 }
 
 .compose h2 {
@@ -155,6 +156,8 @@ ul.stream li div.post div.interaction a {
 
 .panel-feed {
   margin-top: 20px;
+  border:none;
+  background: #f39c12;
 }
 
 .panel-feed .panel-body {
@@ -164,6 +167,7 @@ ul.stream li div.post div.interaction a {
 .feed-container {
   padding-left: 15px;
   padding-right: 15px;
+
 }
 
 

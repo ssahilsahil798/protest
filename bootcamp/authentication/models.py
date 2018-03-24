@@ -151,28 +151,27 @@ class Profile(models.Model):
                 answer=answer).delete()
 
     def notify_login(self):
-        print "reached notify_login"
         user = self.user
-        Notification.objects.filter(
-            notification_type=Notification.LOGGED_OUT, from_user=self.user,
-            to_user=self.user).delete()
-        Notification.objects.get_or_create(
-            notification_type=Notification.LOGGED_IN, from_user=self.user,
-            to_user=self.user)
+        # Notification.objects.filter(
+        #     notification_type=Notification.LOGGED_OUT, from_user=self.user,
+        #     to_user=self.user).delete()
+        # Notification.objects.get_or_create(
+        #     notification_type=Notification.LOGGED_IN, from_user=self.user,
+        #     to_user=self.user)
         self.live_status_notification(True)
-        self.group_notification('log in')
+        # self.group_notification('log in')
         
 
     def notify_logout(self):
         user = self.user
-        Notification.objects.filter(
-            notification_type=Notification.LOGGED_IN, from_user=self.user,
-            to_user=self.user).delete()
-        Notification.objects.get_or_create(
-            notification_type=Notification.LOGGED_OUT, from_user=self.user,
-            to_user=self.user)
+        # Notification.objects.filter(
+        #     notification_type=Notification.LOGGED_IN, from_user=self.user,
+        #     to_user=self.user).delete()
+        # Notification.objects.get_or_create(
+        #     notification_type=Notification.LOGGED_OUT, from_user=self.user,
+        #     to_user=self.user)
         self.live_status_notification(False)
-        self.group_notification('log out')
+        # self.group_notification('log out')
 
 
     def notify_upvoted_question(self, question):
