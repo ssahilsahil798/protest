@@ -1,6 +1,6 @@
 $(function(){       
               $.ajax({
-                url: '/liveuser',
+                url: '/liveuser/',
                 beforeSend: function () {
                    
                 },
@@ -34,6 +34,16 @@ $(function(){
                     if(itemuser == $(this).text().toString().trim()){
                         exist = true;
                         // $(".msg_head").next('.' + itemuser).slideToggle("slow");
+                        if($('.msg_wrap.'+itemuser).prev().is(':visible')){
+
+                        }else{
+                            // $(this).parent().parent().show();
+                            // $(this).parent().show();
+                            // $(this).parent().next('.'+itemuser).slideToggle('slow');
+                            
+                           
+                        }
+
                     }
 
                 });
@@ -150,6 +160,7 @@ $(function(){
 
               // $(".msg_box").html(JSON.parse(event.data));
                       var data = event;
+                      console.log(data);
                       
                     
                       if(event.activity_type === "liveuser_noti"){
@@ -171,7 +182,9 @@ $(function(){
                         if(is_present===false){
                             if(event.username !== currentUser){
                                 if(event.is_logged_in === true){
-                                    $("#chat_pop").append('<div class="itemuser" id="data_append">' + event.username + '</div>');    
+                                    $("#chat_pop").append('<div class="itemuser" id="data_append">' + event.username + '</div>');
+                                    checkFunc();
+                                       
                                 }
                                 
                             }

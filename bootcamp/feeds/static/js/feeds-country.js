@@ -3,17 +3,19 @@ $(function () {
     var fileItemList = [];
     var page_title = $(document).attr("title");
     check_pics();
+    video_resize();
 
     // WebSocket connection management block.
     // Correctly decide between ws:// and wss://
     var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-    var ws_path = ws_scheme + '://' + window.location.host + "/feeds";
+    var ws_path = ws_scheme + '://' + window.location.host + "/feeds/";
     var webSocket = new channels.WebSocketBridge();
     webSocket.connect(ws_path);
 
     // Helpful debugging
     webSocket.socket.onopen = function () {
-        console.log("Connected to feeds stsdfsdfream");
+        console.log("Connected to feeds country");
+        
     };
 
     webSocket.socket.onclose = function () {
@@ -21,10 +23,11 @@ $(function () {
     };
 
     webSocket.listen(function(event) {
+        console.log(event);
         if (event.activity === "new_feed") {
-            if (event.username != currentUser) {
+            
                 check_new_feeds();
-            }
+            
         } else if (event.activity === "liked") {
             console.log(event.username + " just " + event.activity);
             update_feeds();
@@ -84,11 +87,12 @@ $(function () {
         $("#compose-form input[name='last_feed']").val(last_feed);
 
         $.ajax({
-            url: '/feeds/createpost/',
+            url: '/feeds/post/',
             data: $("#compose-form").serialize(),
             type: 'post',
             cache: false,
             success: function (data) {
+                
 
                 $("ul.stream").prepend(data.html);
                 //$(".compose").slideUp();
@@ -101,17 +105,41 @@ $(function () {
     });
 
     function startUploadProcess(post_id){
+        
     var selectedFiles = $(".upload_post").prop('files');
-    formItem = $(".upload_post").parent()
+    formItem = $(".upload_post").parent();
+    var count = selectedFiles.length;
     $.each(selectedFiles, function(index, item){
 
         var myFile = verifyFileIsImageMovieAudio(item)
         if (myFile){
-            uploadFile(myFile, post_id)
+            uploadFile(myFile, post_id);
+
+            
         } else {
+            
             // alert("Some files are invalid uploads.")
         }
+        
     })
+    
+    if(count == 0){
+        var li = $("ul.stream").find("li");
+            var csrf = $(li).attr("csrf");
+          $.ajax({
+            url: '/feeds/post/blank/',
+            data: {
+                'csrfmiddlewaretoken': csrf,
+            },
+            type: 'get',
+            cache: false,
+            success: function (data) {
+
+                
+
+            }
+        });
+    }
     $(".upload_post").val('');
 
 
@@ -199,13 +227,13 @@ $(function () {
     });
 
     var load_feeds = function () {
-        if (!$("#load_feed").hasClass("no-more-feeds")) {
-            var page = $("#load_feed input[name='page']").val();
-            var next_page = parseInt($("#load_feed input[name='page']").val()) + 1;
-            $("#load_feed input[name='page']").val(next_page);
+        if (!$("#load_country_feed").hasClass("no-more-feeds")) {
+            var page = $("#load_country_feed input[name='page']").val();
+            var next_page = parseInt($("#load_country_feed input[name='page']").val()) + 1;
+            $("#load_country_feed input[name='page']").val(next_page);
             $.ajax({
                 url: '/feeds/load/',
-                data: $("#load_feed").serialize(),
+                data: $("#load_country_feed").serialize(),
                 cache: false,
                 beforeSend: function () {
                     $(".load").show();
@@ -216,9 +244,10 @@ $(function () {
                         $("ul.stream").append(data)
                     }
                     else {
-                        $("#load_feed").addClass("no-more-feeds");
+                        $("#load_country_feed").addClass("no-more-feeds");
                     }
                     check_pics();
+                    video_resize();
                 },
                 complete: function () {
                     $(".load").hide();
@@ -228,11 +257,14 @@ $(function () {
 
     };
 
-    $("#load_feed").bind("enterviewport", load_feeds).bullseye();
+    $("#load_country_feed").bind("enterviewport", load_feeds).bullseye();
 
     $(".stream-update a").click(function () {
-        var last_feed = $(".stream li:first-child").attr("feed-id");
+        var last_feed = $(".stream").children('li').attr("feed-id");
+        console.log(last_feed);
         var feed_source = $("#feed_source").val();
+        var li = $("ul.stream").find("li");
+        var csrf = $(li).attr("csrf");
         $.ajax({
             url: '/feeds/load_new/',
             data: {
@@ -242,9 +274,12 @@ $(function () {
             cache: false,
             success: function (data) {
                 $("ul.stream").prepend(data);
+
             },
             complete: function () {
                 hide_stream_update();
+                check_pics();
+                video_resize();
             }
         });
         return false;
@@ -321,14 +356,19 @@ $(function () {
     };
 
     function check_new_feeds () {
-        var last_feed = $(".stream li:first-child").attr("feed-id");
+        var last_feed = $(".stream").children('li').attr("feed-id");
         var feed_source = $("#feed_source").val();
+        var li = $("ul.stream").find("li");
+        var country_tag = $('#country_tag_id').val();
+        var csrf = $(li).attr("csrf");
         if (last_feed != undefined) {
             $.ajax({
                 url: '/feeds/check/',
                 data: {
                     'last_feed': last_feed,
-                    'feed_source': feed_source
+                    'feed_source': feed_source,
+                    'csrfmiddlewaretoken': csrf,
+                    'country_tag': country_tag,
                 },
                 cache: false,
                 success: function (data) {
@@ -336,6 +376,8 @@ $(function () {
                         $(".stream-update .new-posts").text(data);
                         $(".stream-update").show();
                         $(document).attr("title", "(" + data + ") " + page_title);
+                        check_pics();
+                        video_resize();
                     }
                 },
             });
@@ -428,18 +470,24 @@ function constructFormPolicyData(policyData, fileItem) {
 }
 
 function fileUploadComplete(fileItem, policyData){
+
+        var li = $("ul.stream").find("li");
+        var csrf = $(li).attr("csrf");
     data = {
         uploaded: true,
         fileSize: fileItem.size,
         file: policyData.file_id,
-
+        csrfmiddlewaretoken: csrf,
     }
     $.ajax({
         method:"POST",
         data: data,
         url: "/api/files/complete/",
         success: function(data){
-            displayItems(fileItemList)
+            fileItemList = [];
+            displayItems(fileItemList);
+            check_new_feeds();
+
         },
         error: function(jqXHR, textStatus, errorThrown){ 
             // alert("An error occured, please refresh the page.")
@@ -556,7 +604,7 @@ function uploadFile(fileItem, post_id){
 
 
   function check_pics(){
-
+   
     var count = 0;
   $('.fs-gal').click(function() {
     count = 0;
@@ -621,11 +669,8 @@ function uploadFile(fileItem, post_id){
   });
 }
 
-});
-
-$(document).ready(function() {
-
-  if(typeof YOUTUBE_VIDEO_MARGIN == 10) {
+function video_resize(){
+      if(typeof YOUTUBE_VIDEO_MARGIN == 10) {
     YOUTUBE_VIDEO_MARGIN=5;
   }
   $('iframe').each(function(index,item) {
@@ -651,6 +696,13 @@ $(document).ready(function() {
         $('.video').stopVideo();
     }
   });
+}
+
 });
+
+
+
+
+
 
 

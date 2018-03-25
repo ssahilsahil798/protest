@@ -41,9 +41,19 @@ def home(request):
 
 
 @login_required
-def network(request):
-    users_list = User.objects.filter(is_active=True).order_by('username')
-    paginator = Paginator(users_list, 100)
+def network(request):    
+    thisuser = request.user
+    frnds = Friendship.objects.filter(Q(from_user=thisuser) | Q(to_user=thisuser))
+    frndsonline = []
+    for user in frnds:
+        if user.from_user == thisuser:
+            frndsonline.append(user.to_user)
+            print "reached here"
+        elif item.to_user == thisuser:
+            frndsonline.append(user.from_user)
+
+    print frndsonline
+    paginator = Paginator(frndsonline, 100)
     page = request.GET.get('page')
     try:
         users = paginator.page(page)
@@ -328,42 +338,28 @@ def password(request):
 @login_required
 def upload_picture(request):
     try:
-        # profile_pictures = django_settings.MEDIA_ROOT + '/profile_pictures/'
-        # if not os.path.exists(profile_pictures):
-        #     os.makedirs(profile_pictures)
-        # import storages.backends.s3boto3
+        profile_pictures = django_settings.MEDIA_ROOT + '/profile_pictures/'
+        if not os.path.exists(profile_pictures):
+            os.makedirs(profile_pictures)
 
-        # protected_storage = storages.backends.s3boto3.S3Boto3Storage(
-        #   acl='private',
-        #   querystring_auth=True,
-        #   querystring_expire=600, # 10 minutes, try to ensure people won't/can't share
-        # )
-        # f = request.FILES['picture']
-        # filename = storage.open('/media/profile_pictures/' + request.user.username + '_tmp.jpg', 'w')
+        f = request.FILES['picture']
+        filename = profile_pictures + request.user.username + '_tmp.jpg'
+        with open(filename, 'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
 
-        
-        # storage.save('/media/profile_pictures/' + request.user.username + '_tmp.jpg', f)
-        # filename.close()
-        # with filename as destination:
-        #     for chunk in f.chunks():
-        #         destination.write(chunk)
-        # filename.close()
-
-        # f.save(filename, "JPEG")
-        # filename.close()
-        # im = Image.open(filename)
-        # width, height = im.size
-        # if width > 350:
-        #     new_width = 350
-        #     new_height = (height * 350) / width
-        #     new_size = new_width, new_height
-        #     im.thumbnail(new_size, Image.ANTIALIAS)
-        #     im.save(filename)
+        im = Image.open(filename)
+        width, height = im.size
+        if width > 350:
+            new_width = 350
+            new_height = (height * 350) / width
+            new_size = new_width, new_height
+            im.thumbnail(new_size, Image.ANTIALIAS)
+            im.save(filename)
 
         return redirect('/settings/picture/?upload_picture=uploaded')
 
     except Exception:
-        print "eroror slkdfj sdkfj sldkfj sldkfj"
         return redirect('/settings/picture/')
 
 

@@ -46,7 +46,7 @@ urlpatterns = [
     url(r'^(?P<username>[^/]+)/frndstatus$', core_views.frndstatus, name='frndstatus'),
     url(r'^i18n/', include('django.conf.urls.i18n', namespace='i18n')),
     url(r'^api/files/policy/$', FilePolicyAPI.as_view(), name='upload-policy'),
-    url(r'^api/files/complete/$', FilePolicyAPI.as_view(), name='upload-complete'),
+    url(r'^api/files/complete/$', FileUploadCompleteHandler.as_view(), name='upload-complete'),
 
 ]
 

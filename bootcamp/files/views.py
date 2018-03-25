@@ -21,6 +21,8 @@ from .config_aws import (
     AWS_UPLOAD_SECRET_KEY
 )
 from .models import FileItem
+from channels import Group
+import json
 
 
 class FileUploadCompleteHandler(APIView):
@@ -31,7 +33,7 @@ class FileUploadCompleteHandler(APIView):
         file_id = request.POST.get('file')
         size = request.POST.get('fileSize')
         course_obj = None
-        data = {}
+        data = {"uploaded":True}
         type_ = request.POST.get('fileType')
         if file_id:
          obj = FileItem.objects.get(id=int(file_id))
@@ -42,7 +44,13 @@ class FileUploadCompleteHandler(APIView):
          data['id'] = obj.id
          data['saved'] = True
          print obj.type
+         Group('feeds').send({'text': json.dumps({'username': request.user.username,'activity': "new_feed",})})
         return Response(data, status=status.HTTP_200_OK)
+
+
+        
+
+
 
 class FilePolicyAPI(APIView):
     """

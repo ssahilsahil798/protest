@@ -34,7 +34,7 @@ class Feed(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     post = models.TextField(max_length=255)
     youtube_link = models.TextField(max_length=255, null=True, blank=True)
-    country_tag = models.ForeignKey(Country, related_name="country", null=True, blank=True, on_delete=models.CASCADE) 
+    country_tag = models.ForeignKey(Country, related_name="feed_country", null=True, blank=True, on_delete=models.CASCADE) 
     parent = models.ForeignKey(
         'Feed', null=True, blank=True, on_delete=models.SET_NULL)
     likes = models.IntegerField(default=0)
@@ -101,21 +101,22 @@ class Feed(models.Model):
     def linkfy_post(self):
         return bleach.linkify(escape(self.post))
 
-    def feed_log(self, activity):
-        Group('feeds').send({
-            'text': json.dumps({
-                'username': self.user.username,
-                'activity': activity,
-            })
-        })
+#     def feed_log(self, activity):
+#         Group('feeds').send({
+#             'text': json.dumps({
+#                 'username': self.user.username,
+#                 'activity': activity,
+#             })
+#         })
+#         print "Notification Sent"
 
 
-def new_feed_added(sender, instance, created, **kwargs):
-    if created:
-        if instance.parent == None or instance.parent == "":
-            instance.feed_log('new_feed')
+# def new_feed_added(sender, instance, created, **kwargs):
+#     if created:
+#         if instance.parent == None or instance.parent == "":
+#             instance.feed_log('new_feed')
 
-post_save.connect(new_feed_added, sender=Feed)
+# post_save.connect(new_feed_added, sender=Feed)
 
 
 

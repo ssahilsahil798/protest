@@ -1,5 +1,6 @@
 $(function () {
     
+
     $('#notifications').popover({html: true, content: 'Loading...', trigger: 'manual'});
 
     $("#notifications").click(function () {
@@ -38,7 +39,6 @@ $(function () {
     };
 
     webSocket.listen(function(event) {
-        console.log(event);
 
         if (event.activity_type === "notification") {
             $("#notifications").addClass("new-notifications");

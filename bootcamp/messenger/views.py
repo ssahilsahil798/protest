@@ -5,13 +5,22 @@ from django.shortcuts import render
 
 from bootcamp.decorators import ajax_required
 from bootcamp.messenger.models import Message
+from bootcamp.authentication.models import Friendship
+from django.db.models import Q
 
 
 @login_required
 def inbox(request):
     conversations = Message.get_conversations(user=request.user)
-    users_list = User.objects.filter(
-        is_active=True).exclude(username=request.user).order_by('username')
+    thisuser = request.user
+    frnds = Friendship.objects.filter(Q(from_user=thisuser) | Q(to_user=thisuser))
+    frndsonline = []
+    for user in frnds:
+        if user.from_user == thisuser:
+            frndsonline.append(user.to_user)
+            print "reached here"
+        elif item.to_user == thisuser:
+            frndsonline.append(user.from_user)
     active_conversation = None
     messages = None
     if conversations:
@@ -27,7 +36,7 @@ def inbox(request):
     return render(request, 'messenger/inbox.html', {
         'messages': messages,
         'conversations': conversations,
-        'users_list': users_list,
+        'users_list': frndsonline,
         'active': active_conversation
         })
 

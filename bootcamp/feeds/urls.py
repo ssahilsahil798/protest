@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^tags/(?P<countrytag>[^/]+)/$', views.country_feeds, name='country_feeds'),
     url(r'^createpost/$', views.create_post, name='create_post'),
     url(r'^post/$', views.post, name='post'),
+    url(r'^post/blank/$', views.post_blank, name='post_blank'),
     url(r'^like/$', views.like, name='like'),
     url(r'^comment/$', views.comment, name='comment'),
     url(r'^load/$', views.load, name='load'),

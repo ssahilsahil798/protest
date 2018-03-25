@@ -13,6 +13,8 @@ from bootcamp.decorators import ajax_required
 from bootcamp.feeds.models import Feed, Country
 from botocore.client import Config
 import boto3
+from channels import Group
+import json
 
 FEEDS_NUM_PAGES = 10
 s3 = boto3.client('s3')
@@ -20,6 +22,7 @@ s3 = boto3.client('s3')
 @login_required
 def feeds(request):
     all_feeds = Feed.get_feeds()
+    all_feeds = all_feeds.filter(country_tag = None)
     paginator = Paginator(all_feeds, FEEDS_NUM_PAGES)
     feeds = paginator.page(1)
     all_tags = Country.objects.all()
@@ -50,13 +53,13 @@ def feeds(request):
 @login_required
 def country_feeds(request,countrytag):
     country = Country.objects.filter(name=countrytag)
-    print country[0].name
+   
     if country.count() == 1:
         country_tag = country[0].name
-        print("tag " + country_tag)
+        
         all_feeds = Feed.objects.filter(country_tag=country)    
     else:
-        country_tag = "global"
+        country_tag = "Global"
         all_feeds = Feed.objects.all()
     
     paginator = Paginator(all_feeds, FEEDS_NUM_PAGES)
@@ -66,7 +69,7 @@ def country_feeds(request,countrytag):
     from_feed = -1
     if feeds:
         from_feed = feeds[0].id
-
+    print all_feeds
     return render(request, 'feeds/feeds_country.html', {
         'feeds': feeds,
         'from_feed': from_feed,
@@ -89,6 +92,14 @@ def load(request):
     page = request.GET.get('page')
     feed_source = request.GET.get('feed_source')
     all_feeds = Feed.get_feeds(from_feed)
+    if request.GET.get('country_tag'):
+        print all_feeds
+        print "reached if load/"
+        all_feeds = all_feeds.filter(country_tag = Country.objects.get(name=request.GET.get('country_tag')))
+    else:
+        
+        print "reached else load/"
+        print all_feeds
     if feed_source != 'all':
         all_feeds = all_feeds.filter(user__id=feed_source)
 
@@ -124,6 +135,8 @@ def load(request):
         print "reached at function load"
 
     return HttpResponse(html)
+
+
 
 
 def _html_feeds(last_feed, user, csrf_token, feed_source='all'):
@@ -169,6 +182,9 @@ def check(request):
     if feed_source != 'all':
         feeds = feeds.filter(user__id=feed_source)
 
+    if request.GET.get('country_tag'):
+        country_tag = Country.objects.filter(name=request.GET.get('country_tag'))
+        feeds = feeds.filter(country_tag = country_tag)
     count = feeds.count()
     return HttpResponse(count)
 
@@ -195,7 +211,7 @@ def create_post(request):
     post_id = feed.id
     print post_id
     html = _html_feeds(last_feed, user, csrf_token)
-    data = {"post_id": post_id}
+    data = {"post_id": post_id,}
     data = json.dumps(data)
     return HttpResponse(data, content_type="application/json")
 
@@ -211,17 +227,29 @@ def post(request):
     feed.user = user
     post = request.POST['post']
     post = post.strip()
-
     if request.POST.get('country_tag'):
-        feed.country_tag = request.POST.get('country_tag')
+        country_name = request.POST.get('country_tag')
+        country = Country.objects.get(name = country_name)
+        feed.country_tag = country
+        print country.name
     if len(post) > 0:
         feed.post = post[:255]
         feed.save()
+        print feed
+        print feed.country_tag
     post_id = feed.id
     print post_id
     html = _html_feeds(last_feed, user, csrf_token)
-    data = {"html": str(html), "post_id": post_id}
+    data = {"post_id": post_id,}
     data = json.dumps(data)
+    return HttpResponse(data, content_type="application/json")
+
+@login_required
+@ajax_required
+def post_blank(request):
+    Group('feeds').send({'text': json.dumps({'username': request.user.username,'activity': "new_feed",})})
+    print "Notification Sent from post_blank"
+    data = {"notification_sent": True,}
     return HttpResponse(data, content_type="application/json")
 
 
