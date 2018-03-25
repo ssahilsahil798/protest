@@ -101,14 +101,14 @@ class Feed(models.Model):
     def linkfy_post(self):
         return bleach.linkify(escape(self.post))
 
-#     def feed_log(self, activity):
-#         Group('feeds').send({
-#             'text': json.dumps({
-#                 'username': self.user.username,
-#                 'activity': activity,
-#             })
-#         })
-#         print "Notification Sent"
+    def feed_log(self, activity):
+        Group('feeds').send({
+            'text': json.dumps({
+                'username': self.user.username,
+                'activity': activity,
+            })
+        })
+        print "Notification Sent"
 
 
 # def new_feed_added(sender, instance, created, **kwargs):

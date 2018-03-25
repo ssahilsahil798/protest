@@ -600,12 +600,6 @@ function uploadFile(fileItem, post_id){
 
     var count = 0;
   $('.fs-gal').click(function() {
-    count = 0;
-    $(this).parent().children().each(function(){
-        console.log($(this).html);
-        console.log("sahil");
-        count = count +1;
-    })
     fsGal_DisplayImage($(this), count);
   });
   //Display gallery
@@ -613,30 +607,35 @@ function uploadFile(fileItem, post_id){
     //Clear navigation buttons
     $('.fs-gal-view > .fs-gal-prev').fadeOut();
     $('.fs-gal-view > .fs-gal-next').fadeOut();
-    //Set current image
-    var title = obj.attr('alt');
-    if (!title || title == '') { title = obj.attr('title'); }
-    $('.fs-gal-view > h1').text(title);
-    if (!title || title == '') { $('.fs-gal-view > h1').fadeOut(); }
-    else { $('.fs-gal-view > h1').fadeIn(); }
     var img = obj.data('url');
-    $('.fs-gal-view').css('background-image', 'url('+img+')');
-    //Create buttons
-    var image = $(this);
-    var current = $(this).parent().children().index(image);
-    var prev = current - 1;
-    console.log(prev);
-    var next = current + 1;
-    console.log("next" + next + "length" + count);
-    if (prev >= 0) {
-      $(this).parent('.fs-gal-view').data('img-index', prev);
-      $(this).parent('.fs-gal-view').fadeIn();
-    }
-    if (next < count) {
-      $(this).parent('.fs-gal-view').data('img-index', next);
-      $(this).parent('.fs-gal-view').fadeIn();
-    }
-    $('.fs-gal-view').fadeIn(); //Display gallery
+    obj.parent().parent().parent().prev('.fs-gal-view').fadeIn();
+    obj.parent().parent().parent().prev('.fs-gal-view').css('background-image', 'url('+img+')');
+
+    
+    // //Set current image
+    // var title = obj.attr('alt');
+    // if (!title || title == '') { title = obj.attr('title'); }
+    // $('.fs-gal-view > h1').text(title);
+    // if (!title || title == '') { $('.fs-gal-view > h1').fadeOut(); }
+    // else { $('.fs-gal-view > h1').fadeIn(); }
+    // var img = obj.data('url');
+    // $('.fs-gal-view').css('background-image', 'url('+img+')');
+    // //Create buttons
+    // var image = $(this);
+    // var current = $(this).parent().children().index(image);
+    // var prev = current - 1;
+    // console.log(prev);
+    // var next = current + 1;
+    // console.log("next" + next + "length" + count);
+    // if (prev >= 0) {
+    //   $(this).parent('.fs-gal-view').data('img-index', prev);
+    //   $(this).parent('.fs-gal-view').fadeIn();
+    // }
+    // if (next < count) {
+    //   $(this).parent('.fs-gal-view').data('img-index', next);
+    //   $(this).parent('.fs-gal-view').fadeIn();
+    // }
+    // $('.fs-gal-view').fadeIn(); //Display gallery
   }
   //Gallery navigation
   $('.fs-gal-view .fs-gal-nav').click(function() {

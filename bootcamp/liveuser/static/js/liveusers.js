@@ -94,12 +94,12 @@ $(function(){
 
           $('.close').click(function(e){
             e.preventDefault();
-          $(this).parent().parent().hide();
+            $('.msg_box.'+itemuser).remove();
             });
     
           $('.msg_head').click(function(e){
             e.preventDefault();
-             $(this).next('.' + itemuser).slideToggle('slow');
+             $(this).next('.' + itemuser).slideToggle('fast');
             });
 
            
@@ -182,8 +182,18 @@ $(function(){
                         if(is_present===false){
                             if(event.username !== currentUser){
                                 if(event.is_logged_in === true){
-                                    $("#chat_pop").append('<div class="itemuser" id="data_append">' + event.username + '</div>');
-                                    checkFunc();
+                                    if(event.friends){
+                                           for(var i=0; i<event.friends.length; i++){
+                                            if(event.friends[i] === currentUser){
+                                                $("#chat_pop").append('<div class="itemuser" id="data_append">' + event.username + '</div>');
+                                                 checkFunc();
+
+                                            }
+                                         
+                                    }
+                                    }
+                                 
+                                   
                                        
                                 }
                                 

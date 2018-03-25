@@ -6,6 +6,9 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+bootcamp/files/config_aws.py
+bootcamp/.aws
+bootcamp/aws
 .Python
 env/
 bin/

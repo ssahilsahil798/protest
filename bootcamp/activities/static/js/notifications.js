@@ -73,12 +73,12 @@ $(function () {
 
           $('.close').click(function(e){
             e.preventDefault();
-          $(this).parent().parent().hide();
+            $('.msg_box.'+itemuser).remove();
             });
     
           $('.msg_head').click(function(e){
             e.preventDefault();
-             $(this).next('.' + itemuser).slideToggle('slow');
+             $(this).next('.' + itemuser).slideToggle('fast');
             });
 
            
@@ -91,7 +91,9 @@ $(function () {
                   $('.msg_head').find('p').each(function(){
                     if(itemuser == $(this).text().toString().trim()){
                         exist = true;
-
+                            $('.msg_wrap.'+itemuser).slideToggle('fast');
+                            closeInEvent();
+                            
                         // $(".msg_head").next('.' + itemuser).slideToggle("slow");
                             callInConversation(itemuser);
                     }
