@@ -10,14 +10,13 @@
   <link href="{% static 'css/top_tiles.css' %}" rel="stylesheet">
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <script src="{% static 'js/feeds.js' %}"></script>
+  
   <script src="{% static 'js/jquery.bullseye-1.0-min.js' %}"></script>
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.211.0.min.js"></script>
   <script src="https://cdn.rawgit.com/skipser/youtube-autoresize/master/youtube-autoresizer.js"></script>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9/jquery.min.js"></script>
 
    <script src="{% static 'js/fs-gal.js' %}"></script>
-  <link rel="stylesheet" href="{%static 'css/fs-gal.css' %}">
+  <link rel="stylesheet" href="{% static 'css/fs-gal.css' %}">
  
 {% endblock head %}
 {% block extrahead %}
@@ -234,5 +233,6 @@
       var line_labels = {{ line_labels|safe }};
     </script>
     <script src="{% static 'js/graph_data.js' %}"></script>
+    <script src="{% static 'js/feeds.js' %}"></script>
   </div>
 {% endblock main %}

@@ -18,7 +18,7 @@ def user_list(request):
 	print users
 	thisuser = request.user
 	frnds = Friendship.objects.filter(Q(from_user=thisuser) | Q(to_user=thisuser))
-	print frnds
+	frnds = frnds.filter(accepted=True)
 	frndsonline = []
 	for user in users:
 		for item in frnds:

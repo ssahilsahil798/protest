@@ -26,6 +26,13 @@ from bootcamp.authentication.models import Profile, Friendship
 from django.core.files.storage import default_storage as storage
 from django.core.files.base import ContentFile
 import storages.backends.s3boto3
+from botocore.client import Config
+import boto3
+from channels import Group
+import json
+
+
+s3 = boto3.client('s3')
 
 protected_storage = storages.backends.s3boto3.S3Boto3Storage(
   acl='private',
@@ -49,7 +56,7 @@ def network(request):
         if user.from_user == thisuser:
             frndsonline.append(user.to_user)
             print "reached here"
-        elif item.to_user == thisuser:
+        elif user.to_user == thisuser:
             frndsonline.append(user.from_user)
 
     print frndsonline
@@ -89,6 +96,13 @@ def profile(request, username):
         Q(from_user=page_user) | Q(user=page_user)).count()
     data, datepoints = Activity.daily_activity(page_user)
     #friendship = Friendship.objects.filter(from_user=page_user)
+    for item in feeds:
+        feed_files = item.feed_media.all()
+        for sas in feed_files:
+            url = s3.generate_presigned_url(ClientMethod='get_object',Params={'Bucket': 'freemedianews','Key': sas.path})
+            sas.temp_path = url
+            print sas.file_type
+            sas.save()
     
     friendship = "No friends added yet"
     data = {
@@ -160,8 +174,10 @@ def friendrequest(request, username):
                     if action == "accept":
                         print "reached right statement"
                         frnd = friendship[0]
+                        frnd.group_notification("frndrequest")
                         frnd.accepted = True
                         frnd.save()
+                        
                     else:
                         print "reached wrong statement"
                         frnd = friendship[0]
@@ -191,11 +207,12 @@ def friendrequest(request, username):
 
             else:
                 if action == "accept":
-
                     frnd = friendship[0]
+                    frnd.group_notification("frndrequest")
                     frnd.accepted = True
                     print "reached outer else 2 nd"
                     frnd.save()
+
                 else:
                     frnd = friendship[0]
                     frnd.delete()
@@ -218,7 +235,7 @@ def friendrequest(request, username):
         elif frnd.accepted == True and frnd.from_user != request.user:
             button = "Remove Friend"
         elif frnd.accepted == False and frnd.from_user != request.user:
-            button = "Add Friend"
+            button = "Accept"
             button2 = "Ignore"
         data = {
             'from_user': str(frnd.from_user.username),
@@ -246,7 +263,7 @@ def frndstatus(request, username):
     frndship = Friendship.objects.filter(to_user = user, from_user=profileuser)
     if frndship.count()==0:
         frndship = Friendship.objects.filter(to_user = profileuser, from_user=user)
-        print frndship
+       
     if frndship.count() == 0:
         data = {"button":"Add Friend"}
         print "empty set"
@@ -264,7 +281,7 @@ def frndstatus(request, username):
             data = {"button": "Cancel Request"}
             print "3 rd "
         else:
-            data = {"button":"Add Friend", "button2": "Ignore"}
+            data = {"button":"Accept", "button2": "Ignore"}
             print "else 4 th"
             
 

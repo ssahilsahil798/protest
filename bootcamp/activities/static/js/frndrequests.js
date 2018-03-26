@@ -12,7 +12,7 @@ $(function () {
                 url: '/friendrequests/last/',
                 beforeSend: function () {
                     $(".popover-content").html("<div style='text-align:center'><img src='/static/img/loading.gif'></div>");
-                    $("#friendrequests").removeClass("new-notifications");
+                    $('#friendrequests').removeClass('new-frndrequest');
                 },
                 success: function (data) {
                     $(".popover-content").html(data);

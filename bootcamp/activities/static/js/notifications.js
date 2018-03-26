@@ -14,6 +14,7 @@ $(function () {
                 beforeSend: function () {
                     $(".popover-content").html("<div style='text-align:center'><img src='/static/img/loading.gif'></div>");
                     $("#notifications").removeClass("new-notifications");
+
                 },
                 success: function (data) {
                     $(".popover-content").html(data);
@@ -39,7 +40,7 @@ $(function () {
     };
 
     webSocket.listen(function(event) {
-
+            console.log(event);
         if (event.activity_type === "notification") {
             $("#notifications").addClass("new-notifications");
             console.log("new notification");
@@ -52,6 +53,7 @@ $(function () {
                     '<div class="msg_box '+ itemuser + '" style="right:80%"><div class="msg_head"><div class="close" id="itemclose">x</div><p>'+itemuser+'</p></div><div class="msg_wrap ' +itemuser+'"><div class="msg_body ' + itemuser+ '"><div class="msg_a"></div><div class="msg_push"></div></div><div class="msg_footer"><textarea class="msg_input" rows="4"></textarea></div></div></div>';
                        
                     appendInFunc(itemuser, newInElem);
+                    
 
                     
 
@@ -61,12 +63,32 @@ $(function () {
         }else if(event.activity_type === "frndrequest"){
             if(currentUser === event.to_user){
                 $('#friendrequests').addClass('new-frndrequest');
+                checkLiveFrnds();
+            }
+            if(currentUser === event.from_user){
+                $('#friendrequests').addClass('new-frndrequest');
+                checkLiveFrnds();
             }
             
         }
     });
 
 
+
+            function checkLiveFrnds(){
+                 $.ajax({
+                url: '/liveuser/',
+                beforeSend: function () {
+                   
+                },
+                success: function (data) {
+                    $('#chat_pop').append(data);
+                    console.log(data);
+                    
+
+                }
+            });
+            }  
 
           function closeInEvent(itemuser){
 

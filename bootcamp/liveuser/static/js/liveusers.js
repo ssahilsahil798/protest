@@ -1,5 +1,11 @@
 $(function(){       
-              $.ajax({
+              
+
+            checkLiveFrnds();
+            
+
+            function checkLiveFrnds(){
+                 $.ajax({
                 url: '/liveuser/',
                 beforeSend: function () {
                    
@@ -11,6 +17,8 @@ $(function(){
 
                 }
             });
+            }
+             
 
         function checkFunc(){
             $('.itemuser').click(function(){

@@ -15,7 +15,7 @@ from django.utils.html import escape
 from bootcamp.liveuser.models import LoggedInUser
 
 
-
+from django.db.models import Q
 from channels import Group
 
 from bootcamp.activities.models import Notification
@@ -241,14 +241,16 @@ class Friendship(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, editable=False)
     accepted = models.BooleanField(default=False)
 
-    _REQUEST_TEMPLATE = '<a href="/{0}/">{1}</a> Sent you a friend request.'  # noqa: E501
+    _REQUEST_TEMPLATE = '<a href="/{0}/">{1}</a> Sent you a friend request.'
+    _ACCEPT_TEMPLATE = '<a href="/{0}/">{1}</a> Accepted your friend request.'  # noqa: E501
 
     def __str__(self):
     
-        return self._REQUEST_TEMPLATE.format(
-            escape(self.from_user.username),
-            escape(self.from_user.profile.get_screen_name())
-            )
+        if self.accepted == False:
+            return self._REQUEST_TEMPLATE.format(escape(self.from_user.username),escape(self.from_user.profile.get_screen_name()))
+        else:
+            return self._ACCEPT_TEMPLATE.format(escape(self.to_user.username),escape(self.to_user.profile.get_screen_name()))
+
 
     class Meta:
         unique_together = ('from_user', 'to_user',)
@@ -256,11 +258,15 @@ class Friendship(models.Model):
 
     @staticmethod
     def call_latest_frnd_requests(user):
-        frnd_requests = Friendship.objects.filter(
-            to_user=user, accepted=False)
-     
+        frnd_requests_in = Friendship.objects.filter(to_user=user, accepted=False)
+        frnd_requests_sent = Friendship.objects.filter(from_user=user, accepted=True)
+        frnd_requests = []
+        for item in frnd_requests_in:
+            frnd_requests.append(item)
+        for item in frnd_requests_sent:
+            frnd_requests.append(item)
 
-        return frnd_requests[:5]
+        return frnd_requests
 
 
 
@@ -273,6 +279,21 @@ class Friendship(models.Model):
                 'to_user': self.to_user.username,
                 'activity_type': 'frndrequest',
                 'activity': activity
+            })
+        })
+
+
+    def request_accepted_notification(self, activity):
+        print "reaching models notification" 
+        print self.to_user.username
+        Group('notifications').send({
+            'text': json.dumps({
+                'from_user': self.from_user.username,
+                'to_user': self.to_user.username,
+                'activity_type': 'frndrequest',
+                'activity': activity,
+                'accepted':True,
+
             })
         })
 

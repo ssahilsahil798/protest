@@ -70,6 +70,13 @@ def country_feeds(request,countrytag):
     if feeds:
         from_feed = feeds[0].id
     print all_feeds
+    for item in feeds:
+        feed_files = item.feed_media.all()
+        for sas in feed_files:
+            url = s3.generate_presigned_url(ClientMethod='get_object',Params={'Bucket': 'freemedianews','Key': sas.path})
+            sas.temp_path = url
+            print sas.file_type
+            sas.save()
     return render(request, 'feeds/feeds_country.html', {
         'feeds': feeds,
         'from_feed': from_feed,
@@ -225,7 +232,13 @@ def post(request):
     feed = Feed()
     
     feed.user = user
-    post = request.POST['post']
+    
+    if request.POST.get('youtube_link'):
+        youtube_link = request.POST.get('youtube_link')
+        youtube_link = "".join(youtube_link.split())
+        feed.youtube_link = youtube_link.replace("watch?v=", "embed/")
+    post = request.POST.get('post')
+
     post = post.strip()
     if request.POST.get('country_tag'):
         country_name = request.POST.get('country_tag')

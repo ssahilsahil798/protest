@@ -9,6 +9,7 @@ from django.db.models import Q
 def ws_connect(message):
 	frnds_user = []
 	frnds = Friendship.objects.filter(Q(from_user = message.user) | Q(to_user = message.user)).filter(accepted=True)
+	frnds = frnds.filter(accepted=True)
 	for item in frnds:
 		if item.from_user == message.user:
 			frnds_user.append(item.to_user.username)

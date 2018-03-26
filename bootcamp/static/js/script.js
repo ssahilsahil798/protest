@@ -15,11 +15,9 @@ $(document).ready(function(){
 	
 	$('.close').click(function(){
 		$('.msg_box').hide();
-		alert("clcik");
 	});
 	
 	$('.user').click(function(){
-		alert("click");
 		$('.msg_wrap').show();
 		$('.msg_box').show();
 	});
