@@ -22,7 +22,6 @@ s3 = boto3.client('s3')
 @login_required
 def feeds(request):
     all_feeds = Feed.get_feeds()
-    all_feeds = all_feeds.filter(country_tag = None)
     paginator = Paginator(all_feeds, FEEDS_NUM_PAGES)
     feeds = paginator.page(1)
     all_tags = Country.objects.all()

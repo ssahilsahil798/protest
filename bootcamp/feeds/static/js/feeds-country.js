@@ -3,7 +3,6 @@ $(function () {
     var fileItemList = [];
     var page_title = $(document).attr("title");
     check_pics();
-    video_resize();
 
     // WebSocket connection management block.
     // Correctly decide between ws:// and wss://
@@ -78,7 +77,9 @@ $(function () {
     });
 
     $(".btn-post").click(function () {
-
+        if($('.form-group').children('textarea:first-child').val() === ""){
+            $('.form-group').children('textarea:first-child').attr('placeholder','Post cant be blank');
+        }
         var last_feed = $(".stream li:first-child").attr("feed-id");
         if (last_feed == undefined) {
             last_feed = "0";
@@ -93,7 +94,7 @@ $(function () {
             cache: false,
             success: function (data) {
                 
-
+                $('.form-group').children('textarea').val('');
                 $("ul.stream").prepend(data.html);
                 //$(".compose").slideUp();
                 $(".compose").removeClass("composing");
@@ -120,10 +121,11 @@ $(function () {
             
             // alert("Some files are invalid uploads.")
         }
-        
+        $('.form-group').children('textarea:first-child').attr('placeholder','Whats on your mind');
     })
     
     if(count == 0){
+        $('.form-group').children('textarea:first-child').attr('placeholder','Whats on your mind');
         var li = $("ul.stream").find("li");
             var csrf = $(li).attr("csrf");
           $.ajax({
@@ -247,7 +249,6 @@ $(function () {
                         $("#load_country_feed").addClass("no-more-feeds");
                     }
                     check_pics();
-                    video_resize();
                 },
                 complete: function () {
                     $(".load").hide();
@@ -279,7 +280,6 @@ $(function () {
             complete: function () {
                 hide_stream_update();
                 check_pics();
-                video_resize();
             }
         });
         return false;
@@ -377,7 +377,6 @@ $(function () {
                         $(".stream-update").show();
                         $(document).attr("title", "(" + data + ") " + page_title);
                         check_pics();
-                        video_resize();
                     }
                 },
             });
@@ -669,34 +668,7 @@ function uploadFile(fileItem, post_id){
   });
 }
 
-function video_resize(){
-      if(typeof YOUTUBE_VIDEO_MARGIN == 10) {
-    YOUTUBE_VIDEO_MARGIN=5;
-  }
-  $('iframe').each(function(index,item) {
-    $('.video').autoplay=false;
-    $('.video').load();
-    if($(item).attr('src').match(/(https?:)?\/\/www\.youtube\.com/)) {
-      var w=$(item).attr('width');
-      var h=$(item).attr('height');
-      var ar = h/w*100;
-      $('.video').stopVideo();
-      ar=ar.toFixed(2);
-      //Style iframe    
-      $(item).css('position','absolute');
-      $(item).css('top','0');
-      $(item).css('left','0');    
-      $(item).css('width','100%');
-      $(item).css('height','100%');
-      $(item).css('max-width',w+'px');
-      $(item).css('max-height', h+'px');        
-      $(item).wrap('<div style="max-width:'+w+'px;margin:0 auto; padding:'+YOUTUBE_VIDEO_MARGIN+'px;" />');
-      $(item).wrap('<div style="position: relative;padding-bottom: '+ar+'%; height: 0; overflow: hidden;" />');
-    }else{
-        $('.video').stopVideo();
-    }
-  });
-}
+
 
 });
 

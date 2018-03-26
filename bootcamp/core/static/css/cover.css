@@ -25,7 +25,8 @@ body {
 
 .login {
   background-color: #f6f6f6;
-  width: 100%;
+  width: 80%;
+  margin-left: 10%;
   height: 330px;
   border-radius: 7px;
 }

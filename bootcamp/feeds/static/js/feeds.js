@@ -91,10 +91,12 @@ $(function () {
             
             // alert("Some files are invalid uploads.")
         }
+        $('.form-group').children('textarea:first-child').attr('placeholder','Whats on your mind');
        
     })
     console.log(count);
     if(count == 0){
+        $('.form-group').children('textarea:first-child').attr('placeholder','Whats on your mind');
         var li = $("ul.stream").find("li");
             var csrf = $(li).attr("csrf");
           $.ajax({
@@ -105,7 +107,7 @@ $(function () {
             type: 'get',
             cache: false,
             success: function (data) {
-
+                
                 
 
             }
@@ -515,6 +517,10 @@ function uploadFile(fileItem, post_id){
 
 
      $(".btn-post").click(function () {
+        if($('.form-group').children('textarea:first-child').val() === ""){
+            $('.form-group').children('textarea:first-child').attr('placeholder','Post cant be blank');
+        }
+
         var last_feed = $(".stream li:first-child").attr("feed-id");
         if (last_feed == undefined) {
             last_feed = "0";
@@ -528,7 +534,7 @@ function uploadFile(fileItem, post_id){
             type: 'post',
             cache: false,
             success: function (data) {
-
+                $('.form-group').children('textarea').val('');
                 $("ul.stream").prepend(data.html);
                 //$(".compose").slideUp();
                 $(".compose").removeClass("composing");
