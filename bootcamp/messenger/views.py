@@ -19,7 +19,7 @@ def inbox(request):
         if user.from_user == thisuser:
             frndsonline.append(user.to_user)
             print "reached here"
-        elif item.to_user == thisuser:
+        elif user.to_user == thisuser:
             frndsonline.append(user.from_user)
     active_conversation = None
     messages = None
@@ -47,6 +47,7 @@ def msgpopup(request, username):
     conversations = Message.get_conversations(user=request.user)
     users_list = User.objects.filter(
         is_active=True).exclude(username=request.user).order_by('username')
+    thisuser = request.user
     active_conversation = username
     messages = Message.objects.filter(user=request.user,
                                       conversation__username=username)
@@ -68,6 +69,16 @@ def messages(request, username):
     conversations = Message.get_conversations(user=request.user)
     users_list = User.objects.filter(
         is_active=True).exclude(username=request.user).order_by('username')
+    thisuser = request.user
+    print thisuser
+    frnds = Friendship.objects.filter(Q(from_user=thisuser) | Q(to_user=thisuser))
+    frndsonline = []
+    for user in frnds:
+        if user.from_user == thisuser:
+            frndsonline.append(user.to_user)
+            print "reached here"
+        elif user.to_user == thisuser:
+            frndsonline.append(user.from_user)
     active_conversation = username
     messages = Message.objects.filter(user=request.user,
                                       conversation__username=username)
@@ -79,7 +90,7 @@ def messages(request, username):
     return render(request, 'messenger/inbox.html', {
         'messages': messages,
         'conversations': conversations,
-        'users_list': users_list,
+        'users_list': frndsonline,
         'active': active_conversation
         })
 

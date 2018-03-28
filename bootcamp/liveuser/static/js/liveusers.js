@@ -151,7 +151,7 @@ $(function(){
 
 
             var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-            var ws_path = ws_scheme + '://' + window.location.host + "/liveuser/";
+            var ws_path = ws_scheme + '://' + window.location.host + ":8010/liveuser/ws/";
             var webSocket = new channels.WebSocketBridge();
             webSocket.connect(ws_path);
 
@@ -173,14 +173,28 @@ $(function(){
                     
                       if(event.activity_type === "liveuser_noti"){
                       var is_present = false;
-                      $(".itemuser").each(function(){
+                     // $(".itemuser").each(function(){
+                           // if(event.username === $(this).text().toString().trim()){
+                            //    if(event.is_logged_in === true){
+
+
+                          //      }else if (event.is_logged_in === false){
+                         //           $(this).remove();
+                        //            is_present = true;
+                      //          }
+                    //        }else{
+
+
+                  //          }
+                //      });
+			$(".itemuser").each(function(){
                             if(event.username === $(this).text().toString().trim()){
                                 if(event.is_logged_in === true){
-
+                                    $(this).remove();
 
                                 }else if (event.is_logged_in === false){
                                     $(this).remove();
-                                    is_present = true;
+                                    
                                 }
                             }else{
 
