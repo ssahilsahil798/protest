@@ -11,6 +11,7 @@ import markdown
 from bootcamp.articles.forms import ArticleForm
 from bootcamp.articles.models import Article, ArticleComment
 from bootcamp.decorators import ajax_required
+import json
 
 
 def _articles(request, articles):
@@ -52,13 +53,13 @@ class EditArticle(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('articles')
 
 
-@login_required
+
 def articles(request):
     all_articles = Article.get_published()
     return _articles(request, all_articles)
 
 
-@login_required
+
 def article(request, slug):
     article = get_object_or_404(Article, slug=slug, status=Article.PUBLISHED)
     return render(request, 'articles/article.html', {'article': article})
@@ -96,30 +97,31 @@ def preview(request):
         return HttpResponseBadRequest()
 
 
-@login_required
+
 @ajax_required
 def comment(request):
-    try:
-        if request.method == 'POST':
-            article_id = request.POST.get('article')
-            article = Article.objects.get(pk=article_id)
-            comment = request.POST.get('comment')
-            comment = comment.strip()
-            if len(comment) > 0:
-                article_comment = ArticleComment(user=request.user,
-                                                 article=article,
-                                                 comment=comment)
-                article_comment.save()
-            html = ''
-            for comment in article.get_comments():
-                html = '{0}{1}'.format(html, render_to_string(
-                    'articles/partial_article_comment.html',
-                    {'comment': comment}))
+    if request.user.is_authenticated():
+        try:
+            if request.method == 'POST':
+                article_id = request.POST.get('article')
+                article = Article.objects.get(pk=article_id)
+                comment = request.POST.get('comment')
+                comment = comment.strip()
+                if len(comment) > 0:
+                    article_comment = ArticleComment(user=request.user, article=article, comment=comment)
+                    article_comment.save()
+                html = ''
+                for comment in article.get_comments():
+                    html += render_to_string('articles/partial_article_comment.html',{'comment': comment})
+                    print "reachd kkjhkjh"
+                return HttpResponse(html)
 
-            return HttpResponse(html)
+            else:   # pragma: no cover
+                return HttpResponseBadRequest()
 
-        else:   # pragma: no cover
+        except Exception:   # pragma: no cover
             return HttpResponseBadRequest()
 
-    except Exception:   # pragma: no cover
-        return HttpResponseBadRequest()
+    else:
+        data = {"not_logged_in": True,}
+        return HttpResponse(json.dumps(data), content_type="application/json")

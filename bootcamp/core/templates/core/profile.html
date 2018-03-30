@@ -28,9 +28,10 @@
     <h1>{{ page_user.profile.get_screen_name }} {% if page_user.get_full_name %}<small>({{ page_user.username }})</small>{% endif %}</h1>
   </div> 
   <div class = "div2">
+  {% if user.is_authenticated %}
   <button class="frndrequest frnd-button frndadd" id="frndadd1" type="button" onclick="myFunction(this)">Add Friend</button>
   <button class="frndrequest frnd-button frndignore" id="frndignore" type="button" onclick="myFunctionIgnore(this)">Ignore</button>
-
+  {% endif %}
   <script>
 
   $(function(){

@@ -10,7 +10,11 @@
       <img src="{{ user.profile.get_picture }}">
     </div>
     <div class="comment-input clearfix">
-      <textarea class="form-control" rows="1" placeholder="{% trans 'Write a comment...' %}" name="comment" id="comment"></textarea>
+      <button type="button" class="btn btn-primary btn-post" id="comment_art_btn" style="margin:10px; float:right">
+        <span class="glyphicon glyphicon-send"></span> Post
+      </button>
+      <textarea class="form-control" rows="3" style="resize:none;" placeholder="{% trans 'Write a comment...' %}" name="comment" id="comment"></textarea>
+      
     </div>
   </form>
 </div>

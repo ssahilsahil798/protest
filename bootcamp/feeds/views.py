@@ -265,49 +265,59 @@ def post_blank(request):
     return HttpResponse(data, content_type="application/json")
 
 
-@login_required
+
 @ajax_required
 def like(request):
-    feed_id = request.POST['feed']
-    feed = Feed.objects.get(pk=feed_id)
-    user = request.user
-    like = Activity.objects.filter(activity_type=Activity.LIKE, feed=feed_id,
-                                   user=user)
-    if like:
-        user.profile.unotify_liked(feed)
-        like.delete()
-
-    else:
-        like = Activity(activity_type=Activity.LIKE, feed=feed_id, user=user)
-        like.save()
-        user.profile.notify_liked(feed)
-
-    return HttpResponse(feed.calculate_likes())
-
-
-@login_required
-@ajax_required
-def comment(request):
-    if request.method == 'POST':
+    if request.user.is_authenticated():
         feed_id = request.POST['feed']
         feed = Feed.objects.get(pk=feed_id)
-        post = request.POST['post']
-        post = post.strip()
-        if len(post) > 0:
-            post = post[:255]
-            user = request.user
-            feed.comment(user=user, post=post)
-            user.profile.notify_commented(feed)
-            user.profile.notify_also_commented(feed)
+        user = request.user
+        like = Activity.objects.filter(activity_type=Activity.LIKE, feed=feed_id,
+                                       user=user)
+        if like:
+            user.profile.unotify_liked(feed)
+            like.delete()
 
-        return render(request, 'feeds/partial_feed_comments.html',
-                      {'feed': feed})
+        else:
+            like = Activity(activity_type=Activity.LIKE, feed=feed_id, user=user)
+            like.save()
+            user.profile.notify_liked(feed)
 
+        return HttpResponse(feed.calculate_likes())
     else:
-        feed_id = request.GET.get('feed')
-        feed = Feed.objects.get(pk=feed_id)
-        return render(request, 'feeds/partial_feed_comments.html',
-                      {'feed': feed})
+        data = {"not_logged_in": True,}
+        return HttpResponse(json.dumps(data), content_type="application/json")
+    
+
+
+
+@ajax_required
+def comment(request):
+    if request.user.is_authenticated():
+        if request.method == 'POST':
+            feed_id = request.POST['feed']
+            feed = Feed.objects.get(pk=feed_id)
+            post = request.POST['post']
+            post = post.strip()
+            if len(post) > 0:
+                post = post[:255]
+                user = request.user
+                feed.comment(user=user, post=post)
+                user.profile.notify_commented(feed)
+                user.profile.notify_also_commented(feed)
+
+            return render(request, 'feeds/partial_feed_comments.html',
+                          {'feed': feed})
+
+        else:
+            feed_id = request.GET.get('feed')
+            feed = Feed.objects.get(pk=feed_id)
+            return render(request, 'feeds/partial_feed_comments.html',
+                          {'feed': feed})
+    else:
+        data = {'not_logged_in': True,}
+        return HttpResponse(json.dumps(data), content_type="application/json")
+    
 
 
 @login_required
