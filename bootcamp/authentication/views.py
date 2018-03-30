@@ -21,6 +21,7 @@ def signup(request):
                                      email=email)
             user = authenticate(username=username, password=password)
             login(request, user)
+
             #welcome_post = '{0} has joined the network.'.format(user.username)
             #feed = Feed(user=user, post=welcome_post)
             #feed.save()

@@ -24,30 +24,56 @@ $(function () {
     });
   });
 
+
+  $("#comment_art_btn").click(function () {
+    $.ajax({
+        url: '/articles/comment/',
+        data: $("#comment-form").serialize(),
+        cache: false,
+        type: 'post',
+        success: function (data) {
+          if(data.not_logged_in){
+            window.location = "http://www.freemediaweb.com/login/";
+          }else{
+            $("#comment-list").html(data);
+            var comment_count = $("#comment-list .comment").length;
+            $(".comment-count").text(comment_count);
+            $("#comment").val("");
+            $("#comment").blur();
+          }
+          
+        }
+      });
+  });
+
   $("#comment").focus(function () {
     $(this).attr("rows", "3");
     $("#comment-helper").fadeIn();
   });
 
   $("#comment").blur(function () {
-    $(this).attr("rows", "1");
+    $(this).attr("rows", "3");
     $("#comment-helper").fadeOut();
   });
 
   $("#comment").keydown(function (evt) {
     var keyCode = evt.which?evt.which:evt.keyCode;
-    if (evt.ctrlKey && (keyCode == 10 || keyCode == 13)) {
+    if (keyCode == 10 || keyCode == 13) {
       $.ajax({
         url: '/articles/comment/',
         data: $("#comment-form").serialize(),
         cache: false,
         type: 'post',
         success: function (data) {
-          $("#comment-list").html(data);
+          if(data.not_logged_in){
+            window.location = "http://www.freemediaweb.com/login/";
+          }else{
+            $("#comment-list").html(data);
           var comment_count = $("#comment-list .comment").length;
           $(".comment-count").text(comment_count);
           $("#comment").val("");
           $("#comment").blur();
+          }
         }
       });
     }

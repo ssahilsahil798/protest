@@ -6,7 +6,7 @@ $(function () {
     // WebSocket connection management block.
     // Correctly decide between ws:// and wss://
     var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-    var ws_path = ws_scheme + '://' + window.location.host + ":8010/feeds/ws/";
+    var ws_path = ws_scheme + '://' + window.location.host + "/feeds/";
     var webSocket = new channels.WebSocketBridge();
     webSocket.connect(ws_path);
 
@@ -136,9 +136,14 @@ $(function () {
                     $(input).val("");
                 },
                 success: function (data) {
-                    $("ol", container).html(data);
+                    if(data.not_logged_in){
+                        window.location = "http://www.freemediaweb.com/login/";
+                    }else{
+                     $("ol", container).html(data);
                     var post_container = $(container).closest(".post");
                     $(".comment-count", post_container).text($("ol li", container).length);
+                    }
+               
                 }
             });
             return false;
@@ -559,15 +564,22 @@ function uploadFile(fileItem, post_id){
             type: 'post',
             cache: false,
             success: function (data) {
-                if ($(".like", li).hasClass("unlike")) {
-                    $(".like", li).removeClass("unlike");
-                    $(".like .text", li).text("Like");
-                }
-                else {
-                    $(".like", li).addClass("unlike");
-                    $(".like .text", li).text("Unlike");
-                }
-                $(".like .like-count", li).text(data);
+
+                if(data.not_logged_in){
+                        window.location = "http://www.freemediaweb.com/login/";
+                    }else{
+                        if ($(".like", li).hasClass("unlike")) {
+                            $(".like", li).removeClass("unlike");
+                            $(".like .text", li).text("Like");
+                        }
+                        else {
+                            $(".like", li).addClass("unlike");
+                            $(".like .text", li).text("Unlike");
+                        }
+                        $(".like .like-count", li).text(data);
+                    }
+
+                
             }
         });
         return false;
@@ -594,8 +606,14 @@ function uploadFile(fileItem, post_id){
                     $("ol", post).html("<li class='loadcomment'><img src='/static/img/loading.gif'></li>");
                 },
                 success: function (data) {
+
+                    if(data.not_logged_in){
+                        window.location = "http://www.freemediaweb.com/login/";
+                    }else{
                     $("ol", post).html(data);
                     $(".comment-count", post).text($("ol li", post).not(".empty").length);
+                    }
+                   
                 }
             });
         }

@@ -72,7 +72,7 @@
             </div>
             <div class="collapse navbar-collapse" id="menu">
               <ul class="nav navbar-nav">
-
+              {% if user.is_authenticated %}
                 <li>
                   <a href="#" id="notifications" data-container="body" data-toggle="popover" data-placement="bottom" title="Notifications">
                     <span class="glyphicon glyphicon-bell"></span>
@@ -83,7 +83,7 @@
                     <span class="glyphicon glyphicon-user"></span>
                   </a>
                 </li>
-           
+              {% endif %}
                 <li><a href="{% url 'feeds' %}">{% trans 'Home' %}</a></li>
                 <li><a href="{% url 'articles' %}">{% trans 'Articles' %}</a></li>
                 <li><a href="{% url 'questions' %}">{% trans 'Q&A' %}</a></li>
@@ -112,6 +112,8 @@
                   var currentUser = "{{ user.username }}"
                 </script>
             <!-- End JQuery code for Ajax autocomplete search suggestion -->
+
+            {% if user.username %}
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.email }} <b class="caret"></b></a>
                   <ul class="dropdown-menu">
@@ -121,7 +123,16 @@
                     <li><a href="{% url 'logout' %}">{% trans 'Log out' %}</a></li>
                   </ul>
                 </li>
+
+            {% else %}
+            <li>
+                  <a href="{% url 'login' %}" style="color:#222222">LOG IN <b></b></a>
+                  
+                </li>
+
+            {% endif %}
               </ul>
+            
             </div>
           </div>
         </nav>
@@ -141,7 +152,7 @@
         </div>
       </main>
 
-      
+      {% if user.username %}
         <div class="chat_box">
             <div class="chat_head" id="chat_box_head"> Chat Box
             </div>
@@ -155,7 +166,7 @@
         
         </div>
        
-
+      {% endif %}
       
     
     
