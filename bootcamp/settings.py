@@ -1,7 +1,6 @@
 import dj_database_url
 from decouple import Csv, config
 from unipath import Path
-from bootcamp.aws.config import *
 
 PROJECT_DIR = Path(__file__).parent
 
@@ -14,12 +13,18 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL')
-    )
+  'default': {
+      'ENGINE': 'django.db.backends.postgresql_psycopg2',
+      'NAME': 'mydb',
+      'USER': 'protest',
+      'PASSWORD': 'abc_110141',
+      'HOST': 'localhost',
+      'PORT': '5432',
+  }
 }
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+ALLOWED_HOSTS = ['http://freemediaweb.com', 'freemediaweb.com', 'www.freemediaweb.com', '139.59.91.253']
+
 
 # Application definition
 
@@ -37,13 +42,13 @@ INSTALLED_APPS = (
     'bootcamp.feeds',
     'bootcamp.messenger',
     'bootcamp.questions',
-    'bootcamp.liveuser',
     'bootcamp.search',
     'taggit',
-    'channels',
     'storages',
-    'bootcamp.files',
     'rest_framework',
+    'bootcamp.liveuser',
+    'bootcamp.files',
+    'channels',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -104,8 +109,8 @@ LOCALE_PATHS = (PROJECT_DIR.child('locale'), )
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
-STATIC_ROOT = PROJECT_DIR.parent.child('staticfiles')
-STATIC_URL = '/static/'
+#STATIC_ROOT = PROJECT_DIR.parent.child('staticfiles')
+#STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
     PROJECT_DIR.child('static'),
@@ -125,35 +130,31 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 TAGGIT_CASE_INSENSITIVE = True
 
 
-#AWS STORAGE FOR MEDIA
+STATICFILES_LOCATION = 'static'
+#MEDIAFILES_LOCATION = 'media'
+
+
+AWS_STORAGE_BUCKET_NAME = 'freemedianews'
+AWS_S3_REGION_NAME = 'ap-southeast-1'  # e.g. us-east-2
+
+
+# Tell django-storages the domain to use to refer to static files.
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+# Tell the staticfiles app to use S3Boto3 storage when writing the collected static files (when
+# you run `collectstatic`).
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 
 
-# STATICFILES_LOCATION = 'static'
-# MEDIAFILES_LOCATION = 'media'
+# the regular Django file settings but with the custom S3 URLs
+STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
+#MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
 
+#STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+#DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-# AWS_STORAGE_BUCKET_NAME = 'freemedianews'
-# AWS_S3_REGION_NAME = 'ap-southeast-1'  # e.g. us-east-2
-# AWS_ACCESS_KEY_ID = 'AKIAJ6PAHRZ7SF6G6XVA'
-# AWS_SECRET_ACCESS_KEY = '9ZfmgnbOEPAJgIisy60ZNXUYWHoZGRB+mTjJsdFq'
-
-
-# # Tell django-storages the domain to use to refer to static files.
-# AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-
-# # Tell the staticfiles app to use S3Boto3 storage when writing the collected static files (when
-# # you run `collectstatic`).
-# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
-
-
-# # the regular Django file settings but with the custom S3 URLs
-# STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
-# MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
-
-#AWS CODE ENDS
 
 # REDIS setup
 REDIS_URL = config('REDIS_URL', default=('localhost', 6379))
